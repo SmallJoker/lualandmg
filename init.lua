@@ -114,10 +114,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				surf = surf + (mt_elev * 80 * yappy.scale)
 			end
 			
-			if trees < 0 then
-				trees = 0
-			else
-				trees = trees * trees * 20000 + 10
+			trees = trees * trees * 20000 + 10
+			if trees < 10 then
+				trees = 10
 			end
 			
 			surf = math.floor(surf + 0.5)
@@ -194,8 +193,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								data[area:index(x, y + i, z)] = yappy.c_cactus
 							end
 							data[vi] = c_under
-						elseif temp < 35 and temp > -10 then
+						elseif temp > 10 then
 							default.grow_tree(data, area, vector.new(x, y + 1, z), math.random(20) > 14, trees)
+							data[vi] = yappy.c_dirt
+						elseif temp > -20 then
+							yappy.gen_pine_tree(x, y, z, area, data)
 							data[vi] = yappy.c_dirt
 						else
 							data[vi] = c_above
@@ -206,7 +208,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				else
 					data[vi] = c_under
 				end
-			elseif y == surf + 1 and y >= 0 and c_top ~= 0 then
+			elseif y == surf + 1 and y > 0 and c_top ~= 0 then
 				if data[vi] == yappy.c_air then
 					data[vi] = c_top
 				end
