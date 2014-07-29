@@ -1,6 +1,6 @@
 yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
-yappy.scale = 1 / 4 --set to 1 for normal
+yappy.scale = 1 --set to 1 for normal
 
 yappy.ore_chance = 8*8*8
 yappy.ore_min_chance = 6*6*6
