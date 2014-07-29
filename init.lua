@@ -37,7 +37,7 @@ yappy.np_caves = {
 	persist = 0.5
 }
 
--- A value between: 60.0 and -40.0
+-- A value between: 60.0 and -50.0
 yappy.np_temperature = {
 	offset = 0,
 	scale = 1,
@@ -56,7 +56,7 @@ yappy.biomes = { -- 0 = default
 	{-5,	0,						0,						0,						0},
 	{-15,	0,						0,						yappy.c_dirt_snow,		0},
 	{-20,	0,						0,						yappy.c_snowblock,		yappy.c_snow},
-	{-40,	yappy.c_ice,			yappy.c_snowblock,		yappy.c_snowblock,		yappy.c_snow},
+	{-99,	yappy.c_ice,			yappy.c_snowblock,		yappy.c_snowblock,		yappy.c_snow},
 }
 dofile(yappy.mod_path.."/functions.lua")
 
@@ -108,7 +108,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local surf = math.abs(nvals_base[nixz] * 30) - 5
 			local mt_elev = nvals_mountains[nixz] - 0.2
 			local trees = math.abs(nvals_trees[nixz]) - 0.2
-			local temp = (nvals_temperature[nixz] + 0.2) * 50
+			local temp = (nvals_temperature[nixz] + 0.2) * 40
 			
 			if mt_elev > 0 then
 				surf = surf + (mt_elev * 80 * yappy.scale)
@@ -121,7 +121,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			
 			surf = math.floor(surf + 0.5)
 			trees = math.floor(trees + 0.5)
-			temp = math.floor(temp * 2 + 0.5) / 2
+			temp = math.floor((temp * 4) + 0.5) / 4
 			
 			local c_stone = yappy.c_stone
 			local c_under = yappy.c_dirt
@@ -215,7 +215,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			elseif y - surf > -3 and y < surf then
 				data[vi] = c_under
 			elseif y > surf and y <= 0 then
-				if temp < 45 then
+				if temp < -40 then
+					data[vi] = yappy.c_ice
+				elseif temp < -25 and math.random(20) > 5 then
+					data[vi] = yappy.c_ice
+				elseif temp < 45 then
 					data[vi] = yappy.c_water
 				elseif temp == 45 then
 					data[vi] = c_under

@@ -31,7 +31,7 @@ minetest.register_node("yappy:pine_needles", {
 	tiles = {"skylands_needles.png"},
 	inventory_image = "skylands_needles.png",
 	paramtype = "light",
-	groups = {snappy=3, flammable=2},
+	groups = {snappy=3, flammable=2, leaves=1},
 	drop = {
 		max_items = 1,
 		items = {
