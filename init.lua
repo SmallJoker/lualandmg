@@ -188,7 +188,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				--cave, without lava
 			elseif y == surf then
 				if y >= 0 then
-					if math.random(trees) == 2 then
+					if trees > 2 and math.random(trees) == 2 then
 						if temp > 35 then
 							for i=1, math.random(4, 6) do
 								data[area:index(x, y + i, z)] = yappy.c_cactus
