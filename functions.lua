@@ -76,8 +76,8 @@ minetest.register_abm({
 		end
 		local vm = minetest.get_voxel_manip()
 		local emin, emax = vm:read_from_map(
-			{x=pos.x-6, y=pos.y-6, z=pos.z-6}, 
-			{x=pos.x+6, y=pos.y+16, z=pos.z+6})
+			{x=pos.x-4, y=pos.y-4, z=pos.z-4}, 
+			{x=pos.x+4, y=pos.y+14, z=pos.z+4})
 		local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 		local data = vm:get_data()
 		yappy.gen_pine_tree(pos.x, pos.y, pos.z, area, data)
@@ -92,7 +92,7 @@ minetest.register_abm({
 	interval = 10,
 	chance = 10,
 	action = function(pos, node)
-		if minetest.find_node_near(pos, 5, {"ignore", "default:tree"}) then return end
+		if minetest.find_node_near(pos, 4, {"ignore", "default:tree"}) then return end
 		
 		local drops = minetest.get_node_drops(node.name)
 		for _, dropitem in ipairs(drops) do
