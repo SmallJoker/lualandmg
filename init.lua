@@ -52,11 +52,11 @@ yappy.biomes = { -- 0 = default
 	--min temp,		under (stone),	middle (3),				ground (1),				top (1)
 	{50,	yappy.c_desert_stone,	yappy.c_desert_sand,	yappy.c_desert_sand,	0},
 	{40,	yappy.c_sandstone,		yappy.c_sand,			yappy.c_sand,			0},
-	{30,	0,						yappy.c_sand,			yappy.c_grass,			0},
+	{30,	0,						yappy.c_sand,			0,						0},
 	{-5,	0,						0,						0,						0},
-	{-15,	0,						0,						yappy.c_dirt,			yappy.c_snow},
+	{-15,	0,						0,						yappy.c_dirt_snow,		0},
 	{-20,	0,						0,						yappy.c_snowblock,		yappy.c_snow},
-	{-30,	yappy.c_ice,			yappy.c_snowblock,		yappy.c_snowblock,		yappy.c_snow},
+	{-40,	yappy.c_ice,			yappy.c_snowblock,		yappy.c_snowblock,		yappy.c_snow},
 }
 dofile(yappy.mod_path.."/functions.lua")
 
@@ -197,6 +197,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						elseif temp < 35 and temp > -10 then
 							default.grow_tree(data, area, vector.new(x, y + 1, z), math.random(20) > 14, trees)
 							data[vi] = yappy.c_dirt
+						else
+							data[vi] = c_above
 						end
 					elseif data[vi] == yappy.c_air then
 						data[vi] = c_above

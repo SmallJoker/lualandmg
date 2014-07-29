@@ -15,6 +15,7 @@ yappy.c_scoal		=	minetest.get_content_id("default:stone_with_coal")
 yappy.c_snow		=	minetest.get_content_id("default:snow")
 yappy.c_snowblock	=	minetest.get_content_id("default:snowblock")
 yappy.c_ice			=	minetest.get_content_id("default:ice")
+yappy.c_dirt_snow	=	minetest.get_content_id("default:dirt_with_snow")
 
 yappy.c_sand		=	minetest.get_content_id("default:sand")
 yappy.c_sandstone	=	minetest.get_content_id("default:sandstone")
