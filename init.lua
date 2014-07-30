@@ -1,6 +1,7 @@
 yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
 yappy.scale = 1 --set to 1 for normal
+yappy.skip_overgen = true
 
 yappy.ore_chance = 8*8*8
 yappy.ore_min_chance = 6*6*6
@@ -16,7 +17,7 @@ yappy.np_base = {
 yappy.np_mountains = {
 	offset = 0,
 	scale = 1,
-	spread = {x=512, y=512, z=512},
+	spread = {x=256, y=256, z=256},
 	octaves = 4,
 	persist = 0.5
 }
@@ -81,7 +82,7 @@ end)
 local lastPos = {x=6.66,y=6.66,z=6.66}
 
 minetest.register_on_generated(function(minp, maxp, seed)
-	if vector.equals(minp, lastPos) then
+	if yappy.skip_overgen and vector.equals(minp, lastPos) then
 		print("[yappy] Nope.")
 		return
 	end
@@ -105,18 +106,22 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if is_surface then
 		for z = minp.z, maxp.z do
 		for x = minp.x, maxp.x do
-			local surf = math.abs(nvals_base[nixz] * 30) - 5
+			local surf = math.abs(nvals_base[nixz] * 25) - 2
 			local mt_elev = nvals_mountains[nixz] - 0.2
 			local trees = math.abs(nvals_trees[nixz]) - 0.2
 			local temp = (nvals_temperature[nixz] + 0.2) * 40
 			
 			if mt_elev > 0 then
-				surf = surf + (mt_elev * 80 * yappy.scale)
+				surf = surf + (mt_elev * 75 * yappy.scale)
 			end
 			
 			trees = trees * trees * 20000 + 10
 			if trees < 10 then
 				trees = 10
+			end
+			
+			if surf < 0 then
+				surf = surf * 2.5
 			end
 			
 			surf = math.floor(surf + 0.5)
@@ -215,7 +220,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			elseif y - surf > -3 and y < surf then
 				data[vi] = c_under
 			elseif y > surf and y <= 0 then
-				if temp < -40 then
+				if temp < -35 then
 					data[vi] = yappy.c_ice
 				elseif temp < -25 and math.random(20) > 5 then
 					data[vi] = yappy.c_ice
