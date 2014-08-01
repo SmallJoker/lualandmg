@@ -6,7 +6,7 @@ yappy.skip_overgen = true
 yappy.ore_chance =		8*8*8
 yappy.ore_min_chance =	6*6*6
 yappy.tree_chance =		14*14
-yappy.tree_max_chance =	16*16
+yappy.tree_max_chance =	20*20
 
 yappy.np_base = {
 	offset = 0,
@@ -110,11 +110,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for x = minp.x, maxp.x do
 			local surf = math.abs(nvals_base[nixz] * 25) - 2
 			local mt_elev = nvals_mountains[nixz] - 0.2
-			local trees = math.min(nvals_trees[nixz] + 0.1, 0.8)
+			local trees = nvals_trees[nixz] + 0.1
 			local temp = (nvals_temperature[nixz] + 0.2) * 40
 			
 			if mt_elev > 0 then
 				surf = surf + (mt_elev * 75 * yappy.scale)
+			end
+			
+			if trees > 0.9 then
+				trees = 0.9
 			end
 			
 			if trees > 0.3 then
@@ -188,7 +192,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				c_top = cache[7]
 			end
 			local cave = nvals_caves[nixyz]
-			if cave > 0.9 and y - surf < -60 then
+			if cave > 0.9 and y < -20 then
 				--lava cave
 				data[vi] = yappy.c_lava
 			elseif cave < -0.7 and y - surf < -20 then
