@@ -1,10 +1,15 @@
 yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
 yappy.scale = 1 --set to 1 for normal
-yappy.skip_overgen = true
 
-yappy.ore_chance =		8*8*8
-yappy.ore_min_chance =	6*6*6
+-- Experimental
+yappy.skip_overgen = true
+-- Set to true if you want caves also at the surface (can look ugly)
+yappy.caves_everywhere = false
+
+-- Chances for ores and trees
+yappy.ore_chance =		8*8*9
+yappy.ore_min_chance =	5*6*6
 yappy.tree_chance =		14*14
 yappy.tree_max_chance =	20*20
 
@@ -114,7 +119,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local temp = (nvals_temperature[nixz] + 0.2) * 40
 			
 			if mt_elev > 0 then
-				surf = surf + (mt_elev * 75 * yappy.scale)
+				surf = surf + (mt_elev * 75)
 			end
 			
 			if trees > 0.9 then
@@ -131,7 +136,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				surf = surf * 2.5
 			end
 			
-			surf = math.floor(surf + 0.5)
+			surf = math.floor((surf * yappy.scale) + 0.5)
 			trees = math.floor(trees + 0.5)
 			temp = math.floor((temp * 4) + 0.5) / 4
 			
@@ -173,6 +178,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	local nixyz = 1
 	local real_ore_chance = -1
+	local force_caves = yappy.caves_everywhere
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
 		local vi = area:index(minp.x, y, z)
@@ -193,10 +199,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 			local cave = nvals_caves[nixyz]
 			if cave > 0.9 and y < -20 then
-				--lava cave
+				-- Cave, filled with lava
 				data[vi] = yappy.c_lava
-			elseif cave < -0.7 and y - surf < -20 then
-				--cave, without lava
+			elseif cave < -0.7 and ((y - surf < -20) or (force_caves and y < surf + 2)) then
+				-- Empty cave
 			elseif y == surf then
 				if y >= 0 then
 					if trees > 2 and math.random(trees) == 2 then
@@ -239,7 +245,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			elseif y < surf then
 				-- calculate ore chance by depth, if not calculated yet
 				if real_ore_chance < 0 then
-					real_ore_chance = yappy.ore_chance - ((surf - y) / 6)
+					real_ore_chance = yappy.ore_chance - ((surf - y) / 7)
 					real_ore_chance = math.max(math.floor(real_ore_chance), yappy.ore_min_chance)
 				end
 				
@@ -276,6 +282,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
 	vm:write_to_map(data)
+	if force_caves then
+		-- Let water flow into the caves
+		vm:update_liquids()
+	end
 	
 	local chugent = math.ceil((os.clock() - t1) * 1000)
 	print ("[yappy] "..minetest.pos_to_string(minp).." - "..chugent.." ms")
