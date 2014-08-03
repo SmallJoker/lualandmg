@@ -39,6 +39,24 @@ function yappy.gen_ores(data, area, pos, node)
 	end
 end
 
+function yappy.gen_clay(data, area, pos)
+	local len1 = math.random(1, 3)
+	local len2 = math.random(1, 3)
+	local depth = math.random(1, 3)
+	
+	for z = -len2, len2 do
+	for y = 0, depth do
+		local vil = area:index(pos.x - len1, pos.y - y, pos.z + z)
+		for x = -len1, len1 do
+			if data[vil] == yappy.c_sand then
+				data[vil] = yappy.c_clay
+			end
+			vil = vil + 1
+		end
+	end
+	end
+end
+
 -- original source: https://raw.githubusercontent.com/HeroOfTheWinds/skylands-master/master/functions.lua
 function yappy.gen_pine_tree(x, y, z, area, data)
 	local c_tree = minetest.get_content_id("default:tree")

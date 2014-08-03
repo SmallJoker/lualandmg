@@ -4,6 +4,8 @@ yappy.c_dirt	=	minetest.get_content_id("default:dirt")
 yappy.c_stone	=	minetest.get_content_id("default:stone")
 yappy.c_water	=	minetest.get_content_id("default:water_source")
 yappy.c_lava	=	minetest.get_content_id("default:lava_source")
+yappy.c_clay	=	minetest.get_content_id("default:clay")
+yappy.c_jgrass	=	minetest.get_content_id("default:junglegrass")
 
 yappy.c_sdiamond	=	minetest.get_content_id("default:stone_with_diamond")
 yappy.c_smese		=	minetest.get_content_id("default:stone_with_mese")

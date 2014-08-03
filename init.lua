@@ -206,11 +206,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			elseif y == surf then
 				if y >= 0 then
 					if trees > 2 and math.random(trees) == 2 then
-						if temp > 35 then
+						if temp > 42 then
 							for i=1, math.random(4, 6) do
 								data[area:index(x, y + i, z)] = yappy.c_cactus
 							end
 							data[vi] = c_under
+						elseif temp > 34 then
+							default.grow_jungletree(data, area, vector.new(x, y + 1, z), trees)
+							data[vi] = yappy.c_dirt
 						elseif temp > 10 then
 							default.grow_tree(data, area, vector.new(x, y + 1, z), math.random(20) > 14, trees)
 							data[vi] = yappy.c_dirt
@@ -226,19 +229,27 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				else
 					data[vi] = c_under
 				end
-			elseif y == surf + 1 and y > 0 and c_top ~= 0 then
-				if data[vi] == yappy.c_air then
-					data[vi] = c_top
+			elseif y == surf + 1 and y > 0 then
+				if c_top ~= 0 then
+					if data[vi] == yappy.c_air then
+						data[vi] = c_top
+					end
+				elseif temp > 30 and temp < 40 and math.random(5*5) == 2 then
+					data[vi] = yappy.c_jgrass
 				end
 			elseif y - surf > -3 and y < surf then
 				data[vi] = c_under
 			elseif y > surf and y <= 0 then
+				-- Water
 				if temp < -35 then
 					data[vi] = yappy.c_ice
 				elseif temp < -25 and math.random(20) > 5 then
 					data[vi] = yappy.c_ice
 				elseif temp < 45 then
 					data[vi] = yappy.c_water
+					if y == surf + 1 and math.random(18*18) == 2 then
+						yappy.gen_clay(data, area, {x=x, y=y, z=z})
+					end
 				elseif temp == 45 then
 					data[vi] = c_under
 				end
