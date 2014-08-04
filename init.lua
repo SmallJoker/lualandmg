@@ -1,17 +1,20 @@
 yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
-yappy.scale = 1 --set to 1 for normal
+yappy.scale = 1
+yappy.skip_overgen		= true
+yappy.caves_everywhere	= false
+yappy.ore_chance		= 8*8*9
+yappy.ore_min_chance	= 5*6*6
+yappy.tree_chance		= 14*14
+yappy.tree_max_chance	= 20*20
+yappy.clay_chance		= 18*18
+yappy.gravel_chance		= 20*20*20
 
--- Experimental
-yappy.skip_overgen = true
--- Set to true if you want caves also at the surface (can look ugly)
-yappy.caves_everywhere = false
-
--- Chances for ores and trees
-yappy.ore_chance =		8*8*9
-yappy.ore_min_chance =	5*6*6
-yappy.tree_chance =		14*14
-yappy.tree_max_chance =	20*20
+local file = io.open(yappy.mod_path.."/settings.lua", "r")
+if file then
+	io.close(file)
+	dofile(yappy.mod_path.."/settings.lua")
+end
 
 yappy.np_base = {
 	offset = 0,
@@ -68,7 +71,6 @@ yappy.biomes = { -- 0 = default
 }
 dofile(yappy.mod_path.."/functions.lua")
 
-
 if yappy.scale ~= 1 then
 	yappy.np_base.spread = vector.multiply(yappy.np_base.spread, yappy.scale)
 	yappy.np_mountains.spread = vector.multiply(yappy.np_mountains.spread, yappy.scale)
@@ -78,12 +80,15 @@ if yappy.scale ~= 1 then
 end
 
 minetest.register_on_mapgen_init(function(mgparams)
+	-- Read world seed
 	yappy.np_base.seed = mgparams.seed
 	yappy.np_mountains.seed = mgparams.seed + 20
 	yappy.np_trees.seed = mgparams.seed - 20
 	yappy.np_caves.seed = mgparams.seed + 40
 	yappy.np_temperature.seed = mgparams.seed - 40
-	minetest.set_mapgen_params({mgname="singlenode"})
+	if mgparams.mgname ~= "singlenode" then
+		minetest.set_mapgen_params({mgname="singlenode"})
+	end
 end)
 
 local lastPos = {x=6.66,y=6.66,z=6.66}
@@ -177,8 +182,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local nvals_caves = minetest.get_perlin_map(yappy.np_caves, chulens):get3dMap_flat(minp)
 	
 	local nixyz = 1
-	local real_ore_chance = -1
+	local chance_ore = -1
+	local chance_clay = yappy.clay_chance
+	local chance_gravel = yappy.gravel_chance
 	local force_caves = yappy.caves_everywhere
+	
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
 		local vi = area:index(minp.x, y, z)
@@ -247,20 +255,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					data[vi] = yappy.c_ice
 				elseif temp < 45 then
 					data[vi] = yappy.c_water
-					if y == surf + 1 and math.random(18*18) == 2 then
-						yappy.gen_clay(data, area, {x=x, y=y, z=z})
+					if y == surf + 1 and math.random(chance_clay) == 2 then
+						yappy.gen_sheet(data, area, {x=x, y=y, z=z}, yappy.c_clay, yappy.c_sand)
 					end
 				elseif temp == 45 then
 					data[vi] = c_under
 				end
 			elseif y < surf then
 				-- calculate ore chance by depth, if not calculated yet
-				if real_ore_chance < 0 then
-					real_ore_chance = yappy.ore_chance - ((surf - y) / 7)
-					real_ore_chance = math.max(math.floor(real_ore_chance), yappy.ore_min_chance)
+				if chance_ore < 0 then
+					chance_ore = yappy.ore_chance - ((surf - y) / 7)
+					chance_ore = math.max(math.floor(chance_ore), yappy.ore_min_chance)
 				end
 				
-				if math.random(real_ore_chance) == 2 then
+				if math.random(chance_ore) == 2 then
 					local osel = math.random(50)
 					local ore = yappy.c_scoal
 					if osel >= 48 then
@@ -277,7 +285,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					-- spread sphere-like the ores
 					yappy.gen_ores(data, area, {x=x, y=y, z=z}, ore)
 				elseif data[vi] == yappy.c_air then
-					data[vi] = c_stone
+					if math.random(chance_gravel) == 2 then
+						yappy.gen_sheet(data, area, {x=x, y=y, z=z}, yappy.c_gravel)
+					else
+						data[vi] = c_stone
+					end
 				end
 			end
 			nixyz = nixyz + 1

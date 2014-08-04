@@ -39,7 +39,7 @@ function yappy.gen_ores(data, area, pos, node)
 	end
 end
 
-function yappy.gen_clay(data, area, pos)
+function yappy.gen_sheet(data, area, pos, node, replace)
 	local len1 = math.random(1, 3)
 	local len2 = math.random(1, 3)
 	local depth = math.random(1, 3)
@@ -48,8 +48,14 @@ function yappy.gen_clay(data, area, pos)
 	for y = 0, depth do
 		local vil = area:index(pos.x - len1, pos.y - y, pos.z + z)
 		for x = -len1, len1 do
-			if data[vil] == yappy.c_sand then
-				data[vil] = yappy.c_clay
+			local valid = true
+			if replace then
+				if data[vil] ~= replace then
+					valid = false
+				end
+			end
+			if valid then
+				data[vil] = node
 			end
 			vil = vil + 1
 		end

@@ -1,0 +1,15 @@
+-- Scale, 0.5 = small, 1 = normal, 2 = extra large
+yappy.scale = 1
+
+-- Experimental
+yappy.skip_overgen		= true
+-- Set to true if you want caves also at the surface (can look ugly)
+yappy.caves_everywhere	= false
+
+-- Chances for ores and trees
+yappy.ore_chance		= 8*8*9
+yappy.ore_min_chance	= 5*6*6
+yappy.tree_chance		= 14*14
+yappy.tree_max_chance	= 20*20
+yappy.clay_chance		= 18*18
+yappy.gravel_chance		= 20*20*20

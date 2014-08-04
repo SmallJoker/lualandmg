@@ -1,6 +1,7 @@
 yappy.c_air		=	minetest.get_content_id("air")
 yappy.c_grass	=	minetest.get_content_id("default:dirt_with_grass")
 yappy.c_dirt	=	minetest.get_content_id("default:dirt")
+yappy.c_gravel	=	minetest.get_content_id("default:gravel")
 yappy.c_stone	=	minetest.get_content_id("default:stone")
 yappy.c_water	=	minetest.get_content_id("default:water_source")
 yappy.c_lava	=	minetest.get_content_id("default:lava_source")
