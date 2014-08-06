@@ -245,7 +245,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				elseif temp > 30 and temp < 40 and math.random(5*5) == 2 then
 					data[vi] = yappy.c_jgrass
 				end
-			elseif y - surf > -3 and y < surf then
+			elseif y - surf >= -3 and y < surf then
 				data[vi] = c_under
 			elseif y > surf and y <= 0 then
 				-- Water
