@@ -27,7 +27,7 @@ yappy.np_base = {
 yappy.np_mountains = {
 	offset = 0,
 	scale = 1,
-	spread = {x=256, y=256, z=256},
+	spread = {x=512, y=512, z=512},
 	octaves = 4,
 	persist = 0.5
 }
@@ -124,7 +124,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local temp = (nvals_temperature[nixz] + 0.2) * 40
 			
 			if mt_elev > 0 then
-				surf = surf + (mt_elev * 75)
+				surf = surf + (mt_elev * 90)
 			end
 			
 			if trees > 0.9 then
