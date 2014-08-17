@@ -1,5 +1,6 @@
 yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
+yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
 yappy.scale = 1
 yappy.skip_overgen		= true
 yappy.caves_everywhere	= false
@@ -10,10 +11,10 @@ yappy.tree_max_chance	= 20*20
 yappy.clay_chance		= 18*18
 yappy.gravel_chance		= 20*20*20
 
-local file = io.open(yappy.mod_path.."/settings.lua", "r")
+local file = io.open(yappy.settings_file, "r")
 if file then
 	io.close(file)
-	dofile(yappy.mod_path.."/settings.lua")
+	dofile(yappy.settings_file)
 end
 
 yappy.np_base = {
@@ -206,7 +207,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				c_top = cache[7]
 			end
 			local cave = nvals_caves[nixyz]
-			if cave > 0.9 and y < -20 then
+			if cave > 0.93 and y < -20 then
 				-- Cave, filled with lava
 				data[vi] = yappy.c_lava
 			elseif cave < -0.7 and ((y - surf < -20) or (force_caves and y < surf + 2)) then
