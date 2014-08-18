@@ -4,6 +4,7 @@ yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
 yappy.scale = 1
 yappy.skip_overgen		= true
 yappy.caves_everywhere	= false
+yappy.use_mudflow		= true
 yappy.ore_chance		= 8*8*9
 yappy.ore_min_chance	= 5*6*6
 yappy.tree_chance		= 14*14
@@ -300,6 +301,54 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		nixz = nixz - sidelen
 	end
 	nixz = nixz + sidelen
+	end
+	
+	if yappy.use_mudflow and is_surface then
+		nixz = 1
+		for z = minp.z, maxp.z do
+		for x = minp.x, maxp.x do
+			local cache = surface[nixz]
+			local surf, c_under, c_above = cache[1], cache[5], cache[6]
+			
+			-- out of range
+			if surf > maxp.y then
+				surf = minp.y + 1
+			end
+			
+			-- node at surface got removed
+			local vi = area:index(x, surf, z)
+			local node = data[vi]
+			if node ~= yappy.c_air then
+				surf = minp.y + 1
+			end
+			
+			local ground = 6.66
+			local last_node = false
+			local index, last_index = 0, 0
+			for y = surf, minp.y + 1, -1 do
+				vi = area:index(x, y, z)
+				node = data[vi]
+				
+				if last_node and node ~= yappy.c_air then
+					ground = y + 1
+					break
+				end
+				
+				last_node = (node == yappy.c_air)
+				last_index = index
+				index = vi
+			end
+			if ground ~= 6.66 then
+				if ground >= 0 then
+					data[last_index] = c_above
+				else
+					data[last_index] = c_under
+				end
+				data[index] = c_under
+			end
+			nixz = nixz + 1
+		end
+		end
 	end
 	
 	vm:set_data(data)

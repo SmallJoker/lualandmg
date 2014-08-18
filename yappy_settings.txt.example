@@ -8,7 +8,10 @@ yappy.scale = 1
 -- Experimental
 yappy.skip_overgen		= true
 -- Set to true if you want caves also at the surface (can look ugly)
-yappy.caves_everywhere	= false
+yappy.caves_everywhere	= true
+
+-- To make ugly parts nicer!
+yappy.use_mudflow		= true
 
 -- Chances for ores and trees
 yappy.ore_chance		= 8*8*9
