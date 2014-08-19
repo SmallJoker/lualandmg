@@ -225,14 +225,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							default.grow_jungletree(data, area, vector.new(x, y + 1, z), trees)
 							data[vi] = yappy.c_dirt
 						elseif temp > 10 then
-							default.grow_tree(data, area, vector.new(x, y + 1, z), math.random(20) > 14, trees)
-							data[vi] = yappy.c_dirt
-						elseif temp > -20 then
-							if math.random(5) >= 3 then
-								yappy.gen_pine_tree(x, y, z, area, data)
+							if math.random(20) > 2 then
+								default.grow_tree(data, area, vector.new(x, y + 1, z), math.random(20) > 14, trees)
 							else
 								yappy.gen_oak_tree(x, y, z, area, data)
 							end
+							data[vi] = yappy.c_dirt
+						elseif temp > -20 then
+							yappy.gen_pine_tree(x, y, z, area, data)
 							data[vi] = yappy.c_dirt
 						else
 							data[vi] = c_above

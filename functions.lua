@@ -66,12 +66,12 @@ end
 function yappy.gen_oak_tree(x, y, z, area, data)
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_leaves = minetest.get_content_id("yappy:oak_leaves")
-	for h = 1, 9 do
+	for h = 1, 10 do
 		local s = 0
 		if h == 3 then
 			s = h * 0.6
 		elseif h > 3 then
-			s = (11 - h) * 0.6
+			s = (12 - h) * 0.6
 		end
 		s = math.floor(s + 0.5)
 		for i = -s, s do
@@ -85,7 +85,7 @@ function yappy.gen_oak_tree(x, y, z, area, data)
 		end
 		end
 		local middle = c_tree
-		if h >= 8 then
+		if h >= 9 then
 			middle = c_leaves
 		end
 		data[area:index(x, y + h, z)] = middle
