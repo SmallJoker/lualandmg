@@ -28,28 +28,37 @@ yappy.c_desert_stone	=	minetest.get_content_id("default:desert_stone")
 yappy.c_cactus			=	minetest.get_content_id("default:cactus")
 yappy.c_dry_shrub		=	minetest.get_content_id("default:dry_shrub")
 
-minetest.register_node("yappy:pine_needles", {
-	description = "Pine needles",
+local trees = {
+	pine = {"Pine sapling", "skylands_pine_sapling.png", "Pine needles", "skylands_needles.png", "pine_needles", "pine_sapling", 3},
+	oak = {"Oak sapling", "yappy_oak_sapling.png", "Oak leaves", "yappy_oak_leaves.png", "oak_leaves", "oak_sapling", 4}
+}
+
+for k, v in pairs(trees) do
+local grp = {snappy=3, flammable=2, leaves=1, leafdecay=0}
+grp.leafdecay = v[7]
+
+minetest.register_node("yappy:"..v[5], {
+	description = v[3],
 	drawtype = "allfaces_optional",
-	tiles = {"skylands_needles.png"},
-	inventory_image = "skylands_needles.png",
+	tiles = {v[4]},
+	inventory_image = v[4],
 	paramtype = "light",
-	groups = {snappy=3, flammable=2, leaves=1},
+	groups = grp,
 	drop = {
 		max_items = 1,
 		items = {
-			{items = {"yappy:pine_sapling"}, rarity = 40},
-			{items = {"yappy:pine_needles"}}
+			{items = {"yappy:"..v[6]}, rarity = 40},
+			{items = {"yappy:"..v[5]}}
 		}
 	},
 	sounds = default.node_sound_leaves_defaults(),
 })
 
-minetest.register_node("yappy:pine_sapling", {
-	description = "Pine sapling",
+minetest.register_node("yappy:"..v[6], {
+	description = v[1],
 	drawtype = "plantlike",
-	tiles = {"skylands_pine_sapling.png"},
-	inventory_image = "skylands_pine_sapling.png",
+	tiles = {v[2]},
+	inventory_image = v[2],
 	paramtype = "light",
 	walkable = false,
 	selection_box = {
@@ -59,3 +68,4 @@ minetest.register_node("yappy:pine_sapling", {
 	groups = {snappy=2, dig_immediate=3, flammable=2, attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),
 })
+end

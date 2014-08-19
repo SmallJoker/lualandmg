@@ -7,8 +7,8 @@ yappy.caves_everywhere	= false
 yappy.use_mudflow		= true
 yappy.ore_chance		= 8*8*9
 yappy.ore_min_chance	= 5*6*6
-yappy.tree_chance		= 14*14
-yappy.tree_max_chance	= 20*20
+yappy.tree_chance		= 16*16
+yappy.tree_max_chance	= 21*21
 yappy.clay_chance		= 18*18
 yappy.gravel_chance		= 20*20*20
 
@@ -228,7 +228,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							default.grow_tree(data, area, vector.new(x, y + 1, z), math.random(20) > 14, trees)
 							data[vi] = yappy.c_dirt
 						elseif temp > -20 then
-							yappy.gen_pine_tree(x, y, z, area, data)
+							if math.random(5) >= 3 then
+								yappy.gen_pine_tree(x, y, z, area, data)
+							else
+								yappy.gen_oak_tree(x, y, z, area, data)
+							end
 							data[vi] = yappy.c_dirt
 						else
 							data[vi] = c_above
