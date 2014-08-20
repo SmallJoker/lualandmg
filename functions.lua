@@ -75,14 +75,18 @@ function yappy.gen_oak_tree(x, y, z, area, data)
 		end
 		s = math.floor(s + 0.5)
 		for i = -s, s do
-		for k = -s, s do
-			local sum = math.abs(i) + math.abs(k)
-			if sum < s * 1.5 and sum ~= 0 then
-				if math.random(6) > 1 then
-					data[area:index(x + i, y + h, z + k)] = c_leaves
+			local vil = area:index(x - s, y + h, z + i)
+			for k = -s, s do
+				local sum = math.abs(i) + math.abs(k)
+				if sum <= s and sum ~= 0 then
+					if sum ~= s and sum == (h - 4) and math.random(4) > 1 then
+						data[vil] = c_tree
+					elseif math.random(6) > 1 then
+						data[vil] = c_leaves
+					end
 				end
+				vil = vil + 1
 			end
-		end
 		end
 		local middle = c_tree
 		if h >= 9 then
