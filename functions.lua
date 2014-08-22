@@ -124,8 +124,8 @@ end
 
 minetest.register_abm({
 	nodenames = {"yappy:pine_sapling"},
-	interval = 10,
-	chance = 10,
+	interval = 30,
+	chance = 30,
 	action = function(pos, node)
 		local nu = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name
 		if minetest.get_item_group(nu, "soil") == 0 then
@@ -133,11 +133,11 @@ minetest.register_abm({
 		end
 		local vm = minetest.get_voxel_manip()
 		local emin, emax = vm:read_from_map(
-			{x=pos.x-4, y=pos.y-4, z=pos.z-4}, 
+			{x=pos.x-4, y=pos.y-1, z=pos.z-4}, 
 			{x=pos.x+4, y=pos.y+14, z=pos.z+4})
 		local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 		local data = vm:get_data()
-		yappy.gen_pine_tree(pos.x, pos.y, pos.z, area, data)
+		yappy.gen_pine_tree(pos.x, pos.y - 1, pos.z, area, data)
 		vm:set_data(data)
 		vm:write_to_map()
 		vm:update_map()
@@ -146,8 +146,8 @@ minetest.register_abm({
 
 minetest.register_abm({
 	nodenames = {"yappy:oak_sapling"},
-	interval = 10,
-	chance = 10,
+	interval = 30,
+	chance = 30,
 	action = function(pos, node)
 		local nu = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name
 		if minetest.get_item_group(nu, "soil") == 0 then
@@ -155,11 +155,11 @@ minetest.register_abm({
 		end
 		local vm = minetest.get_voxel_manip()
 		local emin, emax = vm:read_from_map(
-			{x=pos.x-4, y=pos.y-4, z=pos.z-4}, 
-			{x=pos.x+4, y=pos.y+14, z=pos.z+4})
+			{x=pos.x-6, y=pos.y-1, z=pos.z-6}, 
+			{x=pos.x+6, y=pos.y+14, z=pos.z+6})
 		local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 		local data = vm:get_data()
-		yappy.gen_oak_tree(pos.x, pos.y, pos.z, area, data)
+		yappy.gen_oak_tree(pos.x, pos.y - 1, pos.z, area, data)
 		vm:set_data(data)
 		vm:write_to_map()
 		vm:update_map()
