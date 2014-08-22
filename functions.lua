@@ -64,6 +64,7 @@ function yappy.gen_sheet(data, area, pos, node, replace)
 end
 
 function yappy.gen_oak_tree(x, y, z, area, data)
+	local c_air = minetest.get_content_id("air")
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_leaves = minetest.get_content_id("yappy:oak_leaves")
 	for h = 1, 10 do
@@ -80,9 +81,13 @@ function yappy.gen_oak_tree(x, y, z, area, data)
 				local sum = math.abs(i) + math.abs(k)
 				if sum <= s and sum ~= 0 then
 					if sum ~= s and sum == (h - 4) and math.random(4) > 1 then
-						data[vil] = c_tree
+						if data[vil] == c_air then
+							data[vil] = c_tree
+						end
 					elseif math.random(6) > 1 then
-						data[vil] = c_leaves
+						if data[vil] == c_air then
+							data[vil] = c_leaves
+						end
 					end
 				end
 				vil = vil + 1
@@ -92,12 +97,16 @@ function yappy.gen_oak_tree(x, y, z, area, data)
 		if h >= 9 then
 			middle = c_leaves
 		end
-		data[area:index(x, y + h, z)] = middle
+		local vil = area:index(x, y + h, z)
+		if data[vil] == c_air then
+			data[vil] = middle
+		end
 	end
 end
 
 -- original source: https://raw.githubusercontent.com/HeroOfTheWinds/skylands-master/master/functions.lua
 function yappy.gen_pine_tree(x, y, z, area, data)
+	local c_air = minetest.get_content_id("air")
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_needles = minetest.get_content_id("yappy:pine_needles")
 	for h = 1, 11 do
@@ -107,30 +116,38 @@ function yappy.gen_pine_tree(x, y, z, area, data)
 				s = 2
 			end
 			for i = -s, s do
-			for k = -s, s do
-				if not (i == 0 and k == 0) and math.random(10) > 2 then
-					data[area:index(x + i, y + h, z + k)] = c_needles
+				local vil = area:index(x - s, y + h, z + i)
+				for k = -s, s do
+					if not (i == 0 and k == 0) and math.random(10) > 2 then
+						if data[vil] == c_air then
+							data[vil] = c_needles
+						end
+					end
+					vil = vil + 1
 				end
-			end
 			end
 		end
 		local middle = c_tree
 		if h >= 10 then
 			middle = c_needles
 		end
-		data[area:index(x, y + h, z)] = middle
+		local vil = area:index(x, y + h, z)
+		if data[vil] == c_air then
+			data[vil] = middle
+		end
 	end
 end
 
 minetest.register_abm({
 	nodenames = {"yappy:pine_sapling"},
-	interval = 30,
-	chance = 30,
+	interval = 40,
+	chance = 40,
 	action = function(pos, node)
 		local nu = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name
 		if minetest.get_item_group(nu, "soil") == 0 then
 			return
 		end
+		minetest.remove_node(pos)
 		local vm = minetest.get_voxel_manip()
 		local emin, emax = vm:read_from_map(
 			{x=pos.x-4, y=pos.y-1, z=pos.z-4}, 
@@ -146,13 +163,14 @@ minetest.register_abm({
 
 minetest.register_abm({
 	nodenames = {"yappy:oak_sapling"},
-	interval = 30,
-	chance = 30,
+	interval = 40,
+	chance = 40,
 	action = function(pos, node)
 		local nu = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name
 		if minetest.get_item_group(nu, "soil") == 0 then
 			return
 		end
+		minetest.remove_node(pos)
 		local vm = minetest.get_voxel_manip()
 		local emin, emax = vm:read_from_map(
 			{x=pos.x-6, y=pos.y-1, z=pos.z-6}, 
