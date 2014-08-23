@@ -63,9 +63,9 @@ dofile(yappy.mod_path.."/nodes.lua")
 
 yappy.biomes = { -- 0 = default
 	--min temp,		under (stone),	middle (3),				ground (1),				top (1)
-	{50,	yappy.c_desert_stone,	yappy.c_desert_sand,	yappy.c_desert_sand,	0},
-	{40,	yappy.c_sandstone,		yappy.c_sand,			yappy.c_sand,			0},
-	{30,	0,						yappy.c_sand,			0,						0},
+	{45,	yappy.c_desert_stone,	yappy.c_desert_sand,	yappy.c_desert_sand,	0},
+	{38,	yappy.c_sandstone,		yappy.c_sand,			yappy.c_sand,			0},
+	{34,	0,						yappy.c_sand,			0,						0},
 	{-5,	0,						0,						0,						0},
 	{-15,	0,						0,						yappy.c_dirt_snow,		0},
 	{-20,	0,						0,						yappy.c_snowblock,		yappy.c_snow},
@@ -216,12 +216,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			elseif y == surf then
 				if y >= 0 then
 					if trees > 2 and math.random(trees) == 2 then
-						if temp > 42 then
+						if temp > 39 then
 							for i=1, math.random(4, 6) do
 								data[area:index(x, y + i, z)] = yappy.c_cactus
 							end
 							data[vi] = c_under
-						elseif temp > 34 then
+						elseif temp > 35 then
 							default.grow_jungletree(data, area, vector.new(x, y + 1, z), trees)
 							data[vi] = yappy.c_dirt
 						elseif temp > 10 then
@@ -248,7 +248,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if data[vi] == yappy.c_air then
 						data[vi] = c_top
 					end
-				elseif temp > 30 and temp < 40 and math.random(5*5) == 2 then
+				elseif temp > 35 and temp < 38 and math.random(5*5) == 2 then
 					data[vi] = yappy.c_jgrass
 				end
 			elseif y - surf >= -3 and y < surf then
@@ -315,7 +315,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local surf, c_under, c_above = cache[1], cache[5], cache[6]
 			
 			-- out of range
-			if surf > maxp.y then
+			if surf - 16 > maxp.y then
 				surf = minp.y + 1
 			end
 			
