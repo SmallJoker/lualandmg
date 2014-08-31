@@ -213,35 +213,40 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				data[vi] = yappy.c_lava
 			elseif cave < -0.7 and ((y - surf < -20) or (force_caves and y < surf + 2)) then
 				-- Empty cave
+			elseif y == surf and y < 0 then
+				-- Sea ground
+				data[vi] = c_under
 			elseif y == surf then
-				if y >= 0 then
-					if trees > 2 and math.random(trees) == 2 then
-						if temp > 39 then
-							for i=1, math.random(4, 6) do
-								data[area:index(x, y + i, z)] = yappy.c_cactus
-							end
-							data[vi] = c_under
-						elseif temp > 35 then
-							default.grow_jungletree(data, area, vector.new(x, y + 1, z), trees)
+				local placed = false
+				if trees > 2 and math.random(trees) == 2 then
+					if temp > 39 then
+						for i=1, math.random(4, 6) do
+							data[area:index(x, y + i, z)] = yappy.c_cactus
+						end
+						data[vi] = c_under
+					else
+						local tree_pos = vector.new(x, y + 1, z)
+						if temp > 35 then
+							default.grow_jungletree(data, area, tree_pos, trees)
 							data[vi] = yappy.c_dirt
+							placed = true
 						elseif temp > 10 then
 							if math.random(20) > 2 then
-								default.grow_tree(data, area, vector.new(x, y + 1, z), math.random(20) > 14, trees)
+								default.grow_tree(data, area, tree_pos, math.random(20) > 14, trees)
 							else
 								yappy.gen_oak_tree(x, y, z, area, data)
 							end
 							data[vi] = yappy.c_dirt
+							placed = true
 						elseif temp > -20 then
 							yappy.gen_pine_tree(x, y, z, area, data)
 							data[vi] = yappy.c_dirt
-						else
-							data[vi] = c_above
+							placed = true
 						end
-					elseif data[vi] == yappy.c_air then
-						data[vi] = c_above
 					end
-				else
-					data[vi] = c_under
+				end
+				if not placed then
+					data[vi] = c_above
 				end
 			elseif y == surf + 1 and y > 0 then
 				if c_top ~= 0 then
@@ -312,7 +317,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for z = minp.z, maxp.z do
 		for x = minp.x, maxp.x do
 			local cache = surface[nixz]
-			local surf, c_under, c_above = cache[1], cache[5], cache[6]
+			local surf, c_stone, c_under, c_above = cache[1], cache[4], cache[5], cache[6]
 			
 			-- out of range
 			if surf - 16 > maxp.y then
@@ -322,33 +327,47 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			-- node at surface got removed
 			local vi = area:index(x, surf, z)
 			local node = data[vi]
-			if node ~= yappy.c_air then
-				surf = minp.y + 1
-			end
+			--if node == c_above or node == c_under then
+			--	surf = minp.y + 1
+			--end
 			
-			local ground = 6.66
-			local last_node = false
-			local index, last_index = 0, 0
+			local max_depth = 4
+			local ground, depth = 6.66, 0
+			local covered = false
 			for y = surf, minp.y + 1, -1 do
 				vi = area:index(x, y, z)
 				node = data[vi]
+				local is_air = (node == yappy.c_air)
 				
-				if last_node and node ~= yappy.c_air then
-					ground = y + 1
+				if node == yappy.c_water then
 					break
 				end
 				
-				last_node = (node == yappy.c_air)
-				last_index = index
-				index = vi
-			end
-			if ground ~= 6.66 then
-				if ground >= 0 then
-					data[last_index] = c_above
-				else
-					data[last_index] = c_under
+				if depth >= max_depth then
+					ground = y + max_depth
+					break
 				end
-				data[index] = c_under
+				
+				if is_air then
+					if depth > 0 then
+						covered = true
+						data[vi] = c_stone
+					end
+					depth = 0
+				else
+					depth = depth + 1
+				end
+			end
+			
+			if ground ~= 6.66 and ground ~= surf then
+				vi = area:index(x, ground, z)
+				if ground >= 0 and not covered then
+					data[vi] = c_above
+				else
+					data[vi] = c_under
+				end
+				vi = area:index(x, ground - 1, z)
+				data[vi] = c_under
 			end
 			nixz = nixz + 1
 		end
