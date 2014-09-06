@@ -261,9 +261,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				data[vi] = c_under
 			elseif y > surf and y <= 0 then
 				-- Water
-				if temp < -35 then
-					data[vi] = yappy.c_ice
-				elseif temp < -25 and math.random(20) > 5 then
+				if temp + math.random(-2, 2) < -28 then
 					data[vi] = yappy.c_ice
 				elseif temp < 45 then
 					data[vi] = yappy.c_water
