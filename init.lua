@@ -209,7 +209,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				c_top = cache[7]
 			end
 			local cave = nvals_caves[nixyz]
-			if cave > 0.93 and y < -20 then
+			if cave > 0.93 and y < -20 and not (is_surface and temp < 5) then
 				-- Cave, filled with lava
 				data[vi] = yappy.c_lava
 			elseif cave < -0.7 and ((y - surf < -20) or (force_caves and y < surf + 2)) then
