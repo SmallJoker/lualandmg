@@ -50,10 +50,9 @@ function yappy.gen_sheet(data, area, pos, node, replace)
 		for x = -len1, len1 do
 			local valid = true
 			if replace then
-				if data[vil] ~= replace then
-					valid = false
-				end
+				valid = (data[vil] == replace)
 			end
+			
 			if valid then
 				data[vil] = node
 			end

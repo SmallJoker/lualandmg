@@ -151,9 +151,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local c_under = yappy.c_dirt
 			local c_above = yappy.c_grass
 			local c_top = 0
+			local noise = math.random(-3, 3)
 			
 			for _,v in ipairs(yappy.biomes) do
-				if temp > v[1] then
+				if temp + noise > v[1] then
 					if v[2] ~= 0 then
 						c_stone = v[2]
 					end
