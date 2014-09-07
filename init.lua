@@ -2,12 +2,11 @@ yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
 yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
 yappy.scale = 1
-yappy.skip_overgen		= false -- experimental
 yappy.caves_everywhere	= true
 yappy.use_mudflow		= true
 yappy.ore_chance		= 8*8*9
 yappy.ore_min_chance	= 5*6*6
-yappy.tree_chance		= 16*16
+yappy.tree_chance		= 14*14
 yappy.tree_max_chance	= 21*21
 yappy.clay_chance		= 18*18
 yappy.gravel_chance		= 20*20*20
@@ -93,14 +92,7 @@ minetest.register_on_mapgen_init(function(mgparams)
 	end
 end)
 
-local lastPos = {x=6.66,y=6.66,z=6.66}
-
 minetest.register_on_generated(function(minp, maxp, seed)
-	if yappy.skip_overgen and vector.equals(minp, lastPos) then
-		print("[yappy] Nope.")
-		return
-	end
-	lastPos = vector.new(minp)
 	local is_surface = maxp.y > -80
 	
 	local t1 = os.clock()
@@ -326,11 +318,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			-- node at surface got removed
 			local vi = area:index(x, surf, z)
 			local node = data[vi]
-			--if node == c_above or node == c_under then
-			--	surf = minp.y + 1
-			--end
 			
-			local max_depth = 4
+			local max_depth = 5
 			local ground, depth = 6.66, 0
 			local covered = false
 			for y = surf, minp.y + 1, -1 do
