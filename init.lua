@@ -2,7 +2,7 @@ yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
 yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
 yappy.scale = 1
-yappy.skip_overgen		= true
+yappy.skip_overgen		= false -- experimental
 yappy.caves_everywhere	= true
 yappy.use_mudflow		= true
 yappy.ore_chance		= 8*8*9
@@ -261,7 +261,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				data[vi] = c_under
 			elseif y > surf and y <= 0 then
 				-- Water
-				if temp + math.random(-2, 2) < -28 then
+				if temp + math.random(-2, 2) < -18 then
 					data[vi] = yappy.c_ice
 				elseif temp < 45 then
 					data[vi] = yappy.c_water
@@ -384,5 +384,4 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	local chugent = math.ceil((os.clock() - t1) * 1000)
 	print ("[yappy] "..minetest.pos_to_string(minp).." - "..chugent.." ms")
-	
 end)
