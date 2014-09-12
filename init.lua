@@ -262,10 +262,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			
 			if y <= surf then
 				local node = data[vi]
-				local made_ores = false
 				local stones = yappy.stones
 				for i, v in ipairs(ores_table) do
-					if y <= v.height_max and y >= v.height_min and not made_ores then
+					if y <= v.height_max and y >= v.height_min then
 						local chance = v.clust_scarcity
 						if chance >= 8*8 then
 							chance = v.clust_scarcity - ((v.height_max - y) / 10)
@@ -282,13 +281,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								valid = (node == v.wherein)
 							end
 						end
+						if valid and v.clust_scarcity < 10 then
+							data[vi] = v.ore
+							break
+						end
 						if valid then
 							if v.ore_type == "scatter" then
 								yappy.gen_ores(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
 							elseif v.ore_type == "sheet" then
 								yappy.gen_sheet(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
 							end
-							made_ores = true
+							break
 						end
 					end
 				end
