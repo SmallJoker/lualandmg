@@ -175,9 +175,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local nvals_caves = minetest.get_perlin_map(yappy.np_caves, chulens):get3dMap_flat(minp)
 	
 	local nixyz = 1
-	local chance_ore = -1
-	local chance_clay = yappy.clay_chance
-	local chance_gravel = yappy.gravel_chance
 	local force_caves = yappy.caves_everywhere
 	local ores_table = yappy.ores_table
 	
@@ -296,11 +293,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				end
 			end
-				-- calculate ore chance by depth, if not calculated yet
-				if chance_ore < 0 then
-					chance_ore = yappy.ore_chance - ((surf - y) / 7)
-					chance_ore = math.max(math.floor(chance_ore), yappy.ore_min_chance)
-				end
 			nixyz = nixyz + 1
 			nixz = nixz + 1
 			vi = vi + 1

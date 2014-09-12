@@ -13,14 +13,16 @@ function minetest.register_ore(oredef)
 		oredef.ore_type = "scatter"
 	end
 	if oredef.ore_type == "sheet" then
-		oredef.clust_size = math.ceil(oredef.clust_size / 2)
+		oredef.clust_size = oredef.clust_size / 2
 	end
+	oredef.clust_size = math.ceil((oredef.clust_size + oredef.clust_num_ores) / 3)
+	
 	
 	if oredef.clust_scarcity > 1 and oredef.clust_size > 1 then
-		oredef.clust_scarcity = oredef.clust_scarcity * (1 + oredef.clust_size / 5)
+		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size * 0.6
 		oredef.clust_size = oredef.clust_size - 1
 	end
-	oredef.clust_scarcity = math.floor(oredef.clust_scarcity)
+	oredef.clust_scarcity = math.ceil(oredef.clust_scarcity)
 	
 	if oredef.wherein == "" then
 		oredef.wherein = -2
@@ -36,12 +38,15 @@ end
 
 function yappy.gen_ores(data, area, pos, node, wherein, size)
 	local noise = math.random(3, 7) / 10
-	local lim = size * size * size * noise
+	local len1 = size + math.random(-1, 1)
+	local len2 = size + math.random(-1, 1)
+	local depth = size + math.random(-1, 1)
+	local lim = len1 * len2 * depth * noise
 	
-	for z = -size, size do
-	for y = 0, size * 2 do
-		local vil = area:index(pos.x - size, pos.y - y, pos.z + z)
-		for x = -size, size do
+	for z = -len2, len2 do
+	for y = 0, depth * 2 do
+		local vil = area:index(pos.x - len1, pos.y - y, pos.z + z)
+		for x = -len1, len1 do
 			if x == 0 and y == 0 and z == 0 then
 				data[vil] = node
 			elseif math.random(3) == 2 then
@@ -52,7 +57,7 @@ function yappy.gen_ores(data, area, pos, node, wherein, size)
 					valid = (data[vil] == node)
 				end
 				if valid then
-					if (math.abs(x) + 1) * (math.abs(y - size) + 1) * (math.abs(z) + 1) <= lim then
+					if (math.abs(x) + 1) * (math.abs(y - depth) + 1) * (math.abs(z) + 1) <= lim then
 						data[vil] = node
 					end
 				end
