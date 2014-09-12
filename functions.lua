@@ -7,28 +7,52 @@ for _,v in ipairs(yappy.biomes) do
 	end
 end
 
-function yappy.gen_ores(data, area, pos, node)
-	local lim = math.random(3, 16)
-	if math.random(3) == 2 then
-		lim = math.floor(lim * 1.6)
+function minetest.register_ore(oredef)
+	local count = #yappy.ores_table + 1
+	if not oredef.ore_type then
+		oredef.ore_type = "scatter"
+	end
+	if oredef.ore_type == "sheet" then
+		oredef.clust_size = math.ceil(oredef.clust_size / 2)
 	end
 	
-	for z = -2, 2 do
-	for y = 0, 4 do
-		local vil = area:index(pos.x - 2, pos.y - y, pos.z + z)
-		for x = -2, 2 do
+	if oredef.clust_scarcity > 1 and oredef.clust_size > 1 then
+		oredef.clust_scarcity = oredef.clust_scarcity * (1 + oredef.clust_size / 5)
+		oredef.clust_size = oredef.clust_size - 1
+	end
+	oredef.clust_scarcity = math.floor(oredef.clust_scarcity)
+	
+	if oredef.wherein == "" then
+		oredef.wherein = -2
+	elseif oredef.wherein == "default:stone" then
+		oredef.wherein = -1
+	else
+		oredef.wherein = minetest.get_content_id(oredef.wherein)
+	end
+	oredef.ore = minetest.get_content_id(oredef.ore)
+	
+	yappy.ores_table[count] = oredef
+end
+
+function yappy.gen_ores(data, area, pos, node, wherein, size)
+	local noise = math.random(3, 7) / 10
+	local lim = size * size * size * noise
+	
+	for z = -size, size do
+	for y = 0, size * 2 do
+		local vil = area:index(pos.x - size, pos.y - y, pos.z + z)
+		for x = -size, size do
 			if x == 0 and y == 0 and z == 0 then
 				data[vil] = node
-			else
-				local found = false
-				for k,v in pairs(yappy.stones) do
-					if k == data[vil] then
-						found = true
-						break
-					end
+			elseif math.random(3) == 2 then
+				local valid = true
+				if wherein == -1 then
+					valid = yappy.stones[data[vil]]
+				elseif wherein ~= -2 then
+					valid = (data[vil] == node)
 				end
-				if found then
-					if (math.abs(x) + 1) * (math.abs(y - 2) + 1) * (math.abs(z) + 1) <= lim and math.random(3) == 2 then
+				if valid then
+					if (math.abs(x) + 1) * (math.abs(y - size) + 1) * (math.abs(z) + 1) <= lim then
 						data[vil] = node
 					end
 				end
@@ -39,20 +63,21 @@ function yappy.gen_ores(data, area, pos, node)
 	end
 end
 
-function yappy.gen_sheet(data, area, pos, node, replace)
-	local len1 = math.random(1, 3)
-	local len2 = math.random(1, 3)
-	local depth = math.random(1, 3)
+function yappy.gen_sheet(data, area, pos, node, wherein, size)
+	local len1 = size + math.random(-1, 1)
+	local len2 = size + math.random(-1, 1)
+	local depth = size + math.random(-1, 1)
 	
 	for z = -len2, len2 do
 	for y = 0, depth do
 		local vil = area:index(pos.x - len1, pos.y - y, pos.z + z)
 		for x = -len1, len1 do
 			local valid = true
-			if replace then
-				valid = (data[vil] == replace)
+			if wherein == -1 then
+				valid = yappy.stones[data[vil]]
+			elseif wherein ~= -2 then
+				valid = (data[vil] == node)
 			end
-			
 			if valid then
 				data[vil] = node
 			end

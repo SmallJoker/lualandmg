@@ -1,15 +1,12 @@
 yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
 yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
+yappy.ores_table = {}
 yappy.scale = 1
 yappy.caves_everywhere	= true
 yappy.use_mudflow		= true
-yappy.ore_chance		= 8*8*9
-yappy.ore_min_chance	= 5*6*6
 yappy.tree_chance		= 14*14
 yappy.tree_max_chance	= 21*21
-yappy.clay_chance		= 18*18
-yappy.gravel_chance		= 20*20*20
 
 local file = io.open(yappy.settings_file, "r")
 if file then
@@ -71,6 +68,7 @@ yappy.biomes = { -- 0 = default
 	{-99,	yappy.c_ice,			yappy.c_snowblock,		yappy.c_snowblock,		yappy.c_snow},
 }
 dofile(yappy.mod_path.."/functions.lua")
+dofile(yappy.mod_path.."/default_mapgen.lua")
 
 if yappy.scale ~= 1 then
 	yappy.np_base.spread = vector.multiply(yappy.np_base.spread, yappy.scale)
@@ -181,6 +179,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local chance_clay = yappy.clay_chance
 	local chance_gravel = yappy.gravel_chance
 	local force_caves = yappy.caves_everywhere
+	local ores_table = yappy.ores_table
 	
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
@@ -257,43 +256,51 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					data[vi] = yappy.c_ice
 				elseif temp < 45 then
 					data[vi] = yappy.c_water
-					if y == surf + 1 and math.random(chance_clay) == 2 then
-						yappy.gen_sheet(data, area, {x=x, y=y, z=z}, yappy.c_clay, yappy.c_sand)
-					end
 				elseif temp == 45 then
 					data[vi] = c_under
 				end
 			elseif y < surf then
+				data[vi] = c_stone
+			end
+			
+			if y <= surf then
+				local node = data[vi]
+				local made_ores = false
+				local stones = yappy.stones
+				for i, v in ipairs(ores_table) do
+					if y <= v.height_max and y >= v.height_min and not made_ores then
+						local chance = v.clust_scarcity
+						if chance >= 8*8 then
+							chance = v.clust_scarcity - ((v.height_max - y) / 10)
+							chance = math.max(chance, v.clust_scarcity * 0.75)
+						end
+						
+						local valid = (math.random(chance) == 1)
+						if valid then
+							if v.wherein == -2 then
+								valid = true
+							elseif v.wherein == -1 then
+								valid = stones[node]
+							else
+								valid = (node == v.wherein)
+							end
+						end
+						if valid then
+							if v.ore_type == "scatter" then
+								yappy.gen_ores(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
+							elseif v.ore_type == "sheet" then
+								yappy.gen_sheet(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
+							end
+							made_ores = true
+						end
+					end
+				end
+			end
 				-- calculate ore chance by depth, if not calculated yet
 				if chance_ore < 0 then
 					chance_ore = yappy.ore_chance - ((surf - y) / 7)
 					chance_ore = math.max(math.floor(chance_ore), yappy.ore_min_chance)
 				end
-				
-				if math.random(chance_ore) == 2 then
-					local osel = math.random(50)
-					local ore = yappy.c_scoal
-					if osel >= 48 then
-						ore = yappy.c_sdiamond
-					elseif osel >= 45 then
-						ore = yappy.c_smese
-					elseif osel == 42 then
-						ore = yappy.c_sgold
-					elseif osel >= 36 then
-						ore = yappy.c_scopper
-					elseif osel >= 18 then
-						ore = yappy.c_siron
-					end
-					-- spread sphere-like the ores
-					yappy.gen_ores(data, area, {x=x, y=y, z=z}, ore)
-				elseif data[vi] == yappy.c_air then
-					if math.random(chance_gravel) == 2 then
-						yappy.gen_sheet(data, area, {x=x, y=y, z=z}, yappy.c_gravel)
-					else
-						data[vi] = c_stone
-					end
-				end
-			end
 			nixyz = nixyz + 1
 			nixz = nixz + 1
 			vi = vi + 1
