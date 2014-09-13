@@ -3,6 +3,7 @@ yappy.mod_path = minetest.get_modpath("yappy")
 yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
 yappy.ores_table = {}
 yappy.scale = 1
+yappy.terrain_scale = 1
 yappy.caves_everywhere	= true
 yappy.use_mudflow		= true
 yappy.tree_chance		= 14*14
@@ -107,6 +108,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	local nixz = 1
 	local surface = {}
+	local terrain_scale = yappy.terrain_scale
+	
 	if is_surface then
 		for z = minp.z, maxp.z do
 		for x = minp.x, maxp.x do
@@ -133,7 +136,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				surf = surf * 2.5
 			end
 			
-			surf = math.floor((surf * yappy.scale) + 0.5)
+			surf = math.floor((surf * terrain_scale) + 0.5)
 			trees = math.floor(trees + 0.5)
 			temp = math.floor((temp * 4) + 0.5) / 4
 			
