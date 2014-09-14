@@ -2,8 +2,8 @@ yappy = {}
 yappy.mod_path = minetest.get_modpath("yappy")
 yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
 yappy.ores_table = {}
-yappy.scale = 1
-yappy.terrain_scale = 1
+yappy.scale				= 1
+yappy.terrain_scale		= 1
 yappy.caves_everywhere	= true
 yappy.use_mudflow		= true
 yappy.tree_chance		= 14*14
@@ -81,12 +81,14 @@ end
 
 minetest.register_on_mapgen_init(function(mgparams)
 	-- Read world seed
-	yappy.np_base.seed = mgparams.seed
-	yappy.np_mountains.seed = mgparams.seed + 20
-	yappy.np_trees.seed = mgparams.seed - 20
-	yappy.np_caves.seed = mgparams.seed + 40
-	yappy.np_temperature.seed = mgparams.seed - 40
+	local seed = mgparams.seed
+	yappy.np_base.seed = seed
+	yappy.np_mountains.seed = seed + 20
+	yappy.np_trees.seed = seed - 20
+	yappy.np_caves.seed = seed + 40
+	yappy.np_temperature.seed = seed - 40
 	if mgparams.mgname ~= "singlenode" then
+		print("[yappy] Setting mapgen to singlenode")
 		minetest.set_mapgen_params({mgname="singlenode"})
 	end
 end)
@@ -178,8 +180,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local nvals_caves = minetest.get_perlin_map(yappy.np_caves, chulens):get3dMap_flat(minp)
 	
 	local nixyz = 1
+	local mid_chunk = minp.x + (sidelen / 2)
 	local force_caves = yappy.caves_everywhere
 	local ores_table = yappy.ores_table
+	
+	for i, v in ipairs(ores_table) do
+		if v.height_min <= maxp.y and v.height_max >= minp.y then
+			local chance = v.clust_scarcity
+			if chance >= 8*8 then
+				chance = v.clust_scarcity - ((v.height_max - mid_chunk) / 10)
+				chance = math.max(chance, v.clust_scarcity * 0.75)
+			end
+			v.current_chance = math.floor(chance)
+		end
+	end
 	
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
@@ -268,23 +282,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local stones = yappy.stones
 				for i, v in ipairs(ores_table) do
 					if y <= v.height_max and y >= v.height_min then
-						local chance = v.clust_scarcity
-						if chance >= 8*8 then
-							chance = v.clust_scarcity - ((v.height_max - y) / 10)
-							chance = math.max(chance, v.clust_scarcity * 0.75)
-						end
-						
-						local valid = (math.random(chance) == 1)
+						local valid = (math.random(v.current_chance) == 1)
 						if valid then
-							if v.wherein == -2 then
-								valid = true
-							elseif v.wherein == -1 then
+							if v.wherein == -1 then
 								valid = stones[node]
-							else
+							elseif v.wherein ~= -2 then
 								valid = (node == v.wherein)
 							end
 						end
-						if valid and v.clust_scarcity < 10 then
+						if valid and v.current_chance < 10 then
 							data[vi] = v.ore
 							break
 						end

@@ -17,7 +17,6 @@ function minetest.register_ore(oredef)
 	end
 	oredef.clust_size = math.ceil((oredef.clust_size + oredef.clust_num_ores) / 3)
 	
-	
 	if oredef.clust_scarcity > 1 and oredef.clust_size > 1 then
 		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size * 0.6
 		oredef.clust_size = oredef.clust_size - 1
@@ -37,7 +36,7 @@ function minetest.register_ore(oredef)
 end
 
 function yappy.gen_ores(data, area, pos, node, wherein, size)
-	local noise = math.random(3, 7) / 10
+	local noise = math.random(5, 8) / 10
 	local len1 = size + math.random(-1, 1)
 	local len2 = size + math.random(-1, 1)
 	local depth = size + math.random(-1, 1)
