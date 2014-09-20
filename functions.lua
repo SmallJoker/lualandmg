@@ -18,12 +18,11 @@ function minetest.register_ore(oredef)
 	oredef.clust_size = math.ceil((oredef.clust_size + oredef.clust_num_ores) / 3)
 	
 	if oredef.clust_scarcity > 1 and oredef.clust_size > 1 then
-		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size * 0.6
-		oredef.clust_size = oredef.clust_size - 1
+		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size * 0.8
 	end
 	oredef.clust_scarcity = math.ceil(oredef.clust_scarcity)
 	
-	if oredef.wherein == "" then
+	if not oredef.wherein then
 		oredef.wherein = -2
 	elseif oredef.wherein == "default:stone" then
 		oredef.wherein = -1
@@ -53,7 +52,7 @@ function yappy.gen_ores(data, area, pos, node, wherein, size)
 				if wherein == -1 then
 					valid = yappy.stones[data[vil]]
 				elseif wherein ~= -2 then
-					valid = (data[vil] == node)
+					valid = (data[vil] == wherein)
 				end
 				if valid then
 					if (math.abs(x) + 1) * (math.abs(y - depth) + 1) * (math.abs(z) + 1) <= lim then
@@ -80,7 +79,7 @@ function yappy.gen_sheet(data, area, pos, node, wherein, size)
 			if wherein == -1 then
 				valid = yappy.stones[data[vil]]
 			elseif wherein ~= -2 then
-				valid = (data[vil] == node)
+				valid = (data[vil] == wherein)
 			end
 			if valid then
 				data[vil] = node
