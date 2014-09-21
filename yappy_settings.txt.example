@@ -2,16 +2,19 @@
 -- Copy and paste this file to your worlds folder.
 -- Rename it to "yappy_settings.txt" and change what you want
 
--- Scale, 0.5 = small, 1 = normal, 2 = extra large
+-- Scale, 0.5 = small, 1 = normal, 2 = extra large [1]
 yappy.scale = 1
 
--- Scale of terrain/hills, < 0 = holes, 1 = normal, 1.5 = high, 2 = very high
+-- Scale of terrain/hills, < 0 = holes, 1 = normal, 1.5 = high, 2 = very high [1]
 yappy.terrain_scale = 1
 
--- Set to true if you want caves also at the surface (can look ugly)
+-- Increase and decrease details. Lowest: -1, highest depends on CPU and memory [0]
+yappy.details = 0
+
+-- Set to true if you want caves also at the surface (can look ugly) [true]
 yappy.caves_everywhere	= true
 
--- To make ugly parts nicer!
+-- To make ugly parts nicer! [true]
 yappy.use_mudflow		= true
 
 -- Chances for ores and trees

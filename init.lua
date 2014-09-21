@@ -4,6 +4,7 @@ yappy.settings_file = minetest.get_worldpath().."/yappy_settings.txt"
 yappy.ores_table = {}
 yappy.scale				= 1
 yappy.terrain_scale		= 1
+yappy.details			= 0
 yappy.caves_everywhere	= true
 yappy.use_mudflow		= true
 yappy.tree_chance		= 14*14
@@ -71,12 +72,11 @@ yappy.biomes = { -- 0 = default
 dofile(yappy.mod_path.."/functions.lua")
 dofile(yappy.mod_path.."/default_mapgen.lua")
 
+local np_list = {"np_base", "np_mountains", "np_trees", "np_caves", "np_temperature"}
 if yappy.scale ~= 1 then
-	yappy.np_base.spread = vector.multiply(yappy.np_base.spread, yappy.scale)
-	yappy.np_mountains.spread = vector.multiply(yappy.np_mountains.spread, yappy.scale)
-	yappy.np_trees.spread = vector.multiply(yappy.np_trees.spread, yappy.scale)
-	yappy.np_caves.spread = vector.multiply(yappy.np_caves.spread, yappy.scale)
-	yappy.np_temperature.spread = vector.multiply(yappy.np_temperature.spread, yappy.scale)
+	for _,v in ipairs(np_list) do
+		yappy[v].spread = vector.multiply(yappy[v].spread, yappy.scale)
+	end
 end
 
 minetest.register_on_mapgen_init(function(mgparams)
@@ -87,9 +87,17 @@ minetest.register_on_mapgen_init(function(mgparams)
 	yappy.np_trees.seed = seed - 20
 	yappy.np_caves.seed = seed + 40
 	yappy.np_temperature.seed = seed - 40
+	
 	if mgparams.mgname ~= "singlenode" then
 		print("[yappy] Setting mapgen to singlenode")
 		minetest.set_mapgen_params({mgname="singlenode"})
+	end
+	
+	if yappy.details == 0 then return end
+	for _,v in ipairs(np_list) do
+		if v ~= "np_temperature" then
+			yappy[v].octaves = yappy[v].octaves + yappy.details
+		end
 	end
 end)
 
