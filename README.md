@@ -1,10 +1,18 @@
 yappy
 =====
 
-Omg so creative Lua mapgen for Minetest
+A mapgen for Minetest.
+Features:
+	Normal, pine and oak trees
+	Ores
+	Caves (also with lava)
+	Mudflow
 
 Requires Minetest 0.4.9 or newer
-License: WTFPL
-Generates: (Lava) caves, trees, mountains, ores, some extra stuff
+License: BSD 3-Clause
 
-Copy & paste "settings.lua.example" to "settings.lua" if you wish to configure something.
+Edit the file
+	yappy_settings.txt.example
+and save it to
+	minetest_folder/worlds/your_world/yappy_settings.txt
+if you wish to configure the terrain of your world.
