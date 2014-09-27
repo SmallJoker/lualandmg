@@ -40,9 +40,10 @@ grp.leafdecay = v[7]
 minetest.register_node("yappy:"..v[5], {
 	description = v[3],
 	drawtype = "allfaces_optional",
+	visual_scale = 1.3,
 	tiles = {v[4]},
-	inventory_image = v[4],
 	paramtype = "light",
+	waving = 1,
 	groups = grp,
 	drop = {
 		max_items = 1,
@@ -57,6 +58,7 @@ minetest.register_node("yappy:"..v[5], {
 minetest.register_node("yappy:"..v[6], {
 	description = v[1],
 	drawtype = "plantlike",
+	visual_scale = 1.0,
 	tiles = {v[2]},
 	inventory_image = v[2],
 	paramtype = "light",
@@ -65,7 +67,7 @@ minetest.register_node("yappy:"..v[6], {
 		type = "fixed",
 		fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
 	},
-	groups = {snappy=2, dig_immediate=3, flammable=2, attached_node=1},
+	groups = {snappy=2, dig_immediate=3, flammable=2, attached_node=1, sapling=1},
 	sounds = default.node_sound_leaves_defaults(),
 })
 end

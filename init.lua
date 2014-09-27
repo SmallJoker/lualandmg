@@ -197,7 +197,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		if v.height_min <= maxp.y and v.height_max >= minp.y then
 			local chance = v.clust_scarcity
 			if chance >= 8*8 then
-				chance = v.clust_scarcity - ((v.height_max - mid_chunk) / 10)
+				chance = v.clust_scarcity - ((v.height_max - mid_chunk) / 20)
 				chance = math.max(chance, v.clust_scarcity * 0.75)
 			end
 			v.current_chance = math.floor(chance)

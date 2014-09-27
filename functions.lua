@@ -21,7 +21,7 @@ function minetest.register_ore(oredef)
 	end
 	
 	if oredef.clust_scarcity > 1 and oredef.clust_size > 1 then
-		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size * 0.8
+		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size
 	end
 	oredef.clust_scarcity = math.ceil(oredef.clust_scarcity)
 	
