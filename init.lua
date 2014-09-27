@@ -21,6 +21,7 @@ yappy.np_base = {
 	scale = 1,
 	spread = {x=512, y=512, z=512},
 	octaves = 5,
+	seed = 42692,
 	persist = 0.5
 }
 
@@ -29,14 +30,16 @@ yappy.np_mountains = {
 	scale = 1,
 	spread = {x=512, y=512, z=512},
 	octaves = 4,
+	seed = 3853,
 	persist = 0.5
 }
 
 yappy.np_trees = {
 	offset = 0,
 	scale = 1,
-	spread = {x=64, y=64, z=64},
+	spread = {x=128, y=128, z=128},
 	octaves = 3,
+	seed = -5432,
 	persist = 0.5
 }
 
@@ -45,6 +48,7 @@ yappy.np_caves = {
 	scale = 1,
 	spread = {x=24, y=20, z=24},
 	octaves = 2,
+	seed = -11842,
 	persist = 0.5
 }
 
@@ -54,6 +58,7 @@ yappy.np_temperature = {
 	scale = 1,
 	spread = {x=512, y=512, z=512},
 	octaves = 2,
+	seed = 921498,
 	persist = 0.5
 }
 
@@ -80,14 +85,6 @@ if yappy.scale ~= 1 then
 end
 
 minetest.register_on_mapgen_init(function(mgparams)
-	-- Read world seed
-	local seed = mgparams.seed
-	yappy.np_base.seed = seed
-	yappy.np_mountains.seed = seed + 20
-	yappy.np_trees.seed = seed - 20
-	yappy.np_caves.seed = seed + 40
-	yappy.np_temperature.seed = seed - 40
-	
 	if mgparams.mgname ~= "singlenode" then
 		print("[yappy] Setting mapgen to singlenode")
 		minetest.set_mapgen_params({mgname="singlenode"})
@@ -125,18 +122,18 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for x = minp.x, maxp.x do
 			local surf = math.abs(nvals_base[nixz] * 25) - 2
 			local mt_elev = nvals_mountains[nixz] - 0.2
-			local trees = nvals_trees[nixz] + 0.1
-			local temp = (nvals_temperature[nixz] + 0.2) * 40
+			local trees = nvals_trees[nixz] + 0.4
+			local temp = (nvals_temperature[nixz] + 0.3) * 38
 			
 			if mt_elev > 0 then
 				surf = surf + (mt_elev * 90)
 			end
 			
-			if trees > 0.9 then
-				trees = 0.9
+			if trees > 0.85 then
+				trees = 0.85
 			end
 			
-			if trees > 0.3 then
+			if trees > 0.5 then
 				trees = yappy.tree_chance - (yappy.tree_chance * trees)
 			else
 				trees = yappy.tree_max_chance
@@ -172,6 +169,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 					break
 				end
+			end
+			
+			if temp > 33 and temp < 36 and math.random(5*5) == 2 then
+				c_top = yappy.c_jgrass
 			end
 			
 			surface[nixz] = {surf, trees, temp,
@@ -237,8 +238,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						for i=1, math.random(4, 6) do
 							data[area:index(x, y + i, z)] = yappy.c_cactus
 						end
-						data[vi] = c_under
-					else
+						data[vi] = yappy.c_desert_sand
+						placed = true
+					elseif x + 4 < maxp.x and 
+							x - 4 > minp.x and 
+							y + 10 < maxp.y and 
+							z + 4 < maxp.z and 
+							z - 4 > minp.z then
 						local tree_pos = vector.new(x, y + 1, z)
 						if temp > 35 then
 							default.grow_jungletree(data, area, tree_pos, trees)
@@ -262,13 +268,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				if not placed then
 					data[vi] = c_above
 				end
-			elseif y == surf + 1 and y > 0 then
-				if c_top ~= 0 then
-					if data[vi] == yappy.c_air then
+			elseif y == surf + 1 and y > 0 and c_top ~= 0 then
+				if data[vi] == yappy.c_air then
+					if data[area:index(x, y - 1, z)] == c_above then
 						data[vi] = c_top
 					end
-				elseif temp > 35 and temp < 38 and math.random(5*5) == 2 then
-					data[vi] = yappy.c_jgrass
 				end
 			elseif y - surf >= -3 and y < surf then
 				data[vi] = c_under
@@ -276,9 +280,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				-- Water
 				if temp + math.random(-2, 2) < -18 then
 					data[vi] = yappy.c_ice
-				elseif temp < 45 then
+				elseif temp < 43 then
 					data[vi] = yappy.c_water
-				elseif temp == 45 then
+				elseif temp >= 43 and temp <= 44 then
 					data[vi] = c_under
 				end
 			elseif y < surf then
@@ -306,6 +310,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							if v.ore_type == "scatter" then
 								yappy.gen_ores(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
 							elseif v.ore_type == "sheet" then
+								print("s "..x.." "..y.." "..z)
 								yappy.gen_sheet(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
 							end
 							break
