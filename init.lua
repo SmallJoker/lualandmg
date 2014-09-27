@@ -310,7 +310,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							if v.ore_type == "scatter" then
 								yappy.gen_ores(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
 							elseif v.ore_type == "sheet" then
-								print("s "..x.." "..y.." "..z)
 								yappy.gen_sheet(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
 							end
 							break
