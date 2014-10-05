@@ -38,18 +38,18 @@ yappy.np_trees = {
 	offset = 0,
 	scale = 1,
 	spread = {x=128, y=128, z=128},
-	octaves = 3,
+	octaves = 2,
 	seed = -5432,
-	persist = 0.5
+	persist = 0.6
 }
 
 yappy.np_caves = {
 	offset = 0,
 	scale = 1,
-	spread = {x=24, y=20, z=24},
+	spread = {x=24, y=16, z=24},
 	octaves = 2,
 	seed = -11842,
-	persist = 0.5
+	persist = 0.7
 }
 
 -- A value between: 60.0 and -50.0
@@ -77,24 +77,24 @@ yappy.biomes = { -- 0 = default
 dofile(yappy.mod_path.."/functions.lua")
 dofile(yappy.mod_path.."/default_mapgen.lua")
 
-local np_list = {"np_base", "np_mountains", "np_trees", "np_caves", "np_temperature"}
+local np_list = {"np_base", "np_mountains", "np_trees", "np_temperature"}
 if yappy.scale ~= 1 then
 	for _,v in ipairs(np_list) do
 		yappy[v].spread = vector.multiply(yappy[v].spread, yappy.scale)
 	end
 end
+if yappy.details ~= 0 then
+	for _,v in ipairs(np_list) do
+		if v ~= "np_temperature" and v ~= "np_trees" then
+			yappy[v].octaves = yappy[v].octaves + yappy.details
+		end
+	end
+end
 
 minetest.register_on_mapgen_init(function(mgparams)
 	if mgparams.mgname ~= "singlenode" then
-		print("[yappy] Setting mapgen to singlenode")
+		print("[yappy] Set mapgen to singlenode")
 		minetest.set_mapgen_params({mgname="singlenode"})
-	end
-	
-	if yappy.details == 0 then return end
-	for _,v in ipairs(np_list) do
-		if v ~= "np_temperature" then
-			yappy[v].octaves = yappy[v].octaves + yappy.details
-		end
 	end
 end)
 
