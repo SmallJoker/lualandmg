@@ -62,6 +62,15 @@ yappy.np_temperature = {
 	persist = 0.5
 }
 
+yappy.np_cliffs = {
+	offset = 0,
+	scale = 1,
+	spread = {x=128, y=128, z=128},
+	octaves = 4,
+	seed = 965842,
+	persist = 0.7
+}
+
 dofile(yappy.mod_path.."/nodes.lua")
 
 yappy.biomes = { -- 0 = default
@@ -77,7 +86,7 @@ yappy.biomes = { -- 0 = default
 dofile(yappy.mod_path.."/functions.lua")
 dofile(yappy.mod_path.."/default_mapgen.lua")
 
-local np_list = {"np_base", "np_mountains", "np_trees", "np_temperature"}
+local np_list = {"np_base", "np_mountains", "np_trees", "np_temperature", "np_cliffs"}
 if yappy.scale ~= 1 then
 	for _,v in ipairs(np_list) do
 		yappy[v].spread = vector.multiply(yappy[v].spread, yappy.scale)
@@ -105,12 +114,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local sidelen = maxp.x - minp.x + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
 	
-	local nvals_base, nvals_mountains, nvals_trees, nvals_temperature
+	local nvals_base, nvals_mountains, nvals_trees, nvals_temperature, nvals_cliffs
 	if is_surface then
 		nvals_base = minetest.get_perlin_map(yappy.np_base, chulens):get2dMap_flat({x=minp.x, y=minp.z})
 		nvals_mountains = minetest.get_perlin_map(yappy.np_mountains, chulens):get2dMap_flat({x=minp.x, y=minp.z})
 		nvals_trees = minetest.get_perlin_map(yappy.np_trees, chulens):get2dMap_flat({x=minp.x, y=minp.z})
 		nvals_temperature = minetest.get_perlin_map(yappy.np_temperature, chulens):get2dMap_flat({x=minp.x, y=minp.z})
+		nvals_cliffs = minetest.get_perlin_map(yappy.np_cliffs, chulens):get2dMap_flat({x=minp.x, y=minp.z})
 	end
 	
 	local nixz = 1
@@ -124,9 +134,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local mt_elev = nvals_mountains[nixz] - 0.2
 			local trees = nvals_trees[nixz] + 0.4
 			local temp = (nvals_temperature[nixz] + 0.3) * 38
+			local cliffs = nvals_cliffs[nixz] * 6 + 6
 			
 			if mt_elev > 0 then
 				surf = surf + (mt_elev * 90)
+			end
+			if cliffs > 11 and cliffs - surf > 0 and cliffs - surf < 8 then
+				surf = cliffs
 			end
 			
 			if trees > 0.85 then
