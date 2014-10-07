@@ -16,12 +16,12 @@ function minetest.register_ore(oredef)
 		oredef.clust_size = oredef.clust_size / 2
 	end
 	oredef.clust_size = math.ceil((oredef.clust_size + oredef.clust_num_ores) / 3)
-	if oredef.clust_size > 4 then
-		oredef.clust_size = 4
+	if oredef.clust_size > 3 then
+		oredef.clust_size = 3
 	end
 	
 	if oredef.clust_scarcity > 1 and oredef.clust_size > 1 then
-		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size
+		oredef.clust_scarcity = oredef.clust_scarcity * oredef.clust_size * 1.3
 	end
 	oredef.clust_scarcity = math.ceil(oredef.clust_scarcity)
 	
@@ -32,6 +32,7 @@ function minetest.register_ore(oredef)
 	else
 		oredef.wherein = minetest.get_content_id(oredef.wherein)
 	end
+	
 	oredef.ore = minetest.get_content_id(oredef.ore)
 	
 	yappy.ores_table[count] = oredef

@@ -189,7 +189,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local nvals_caves = minetest.get_perlin_map(yappy.np_caves, chulens):get3dMap_flat(minp)
 	
 	local nixyz = 1
-	local mid_chunk = minp.x + (sidelen / 2)
+	local mid_chunk = minp.y + (sidelen / 2)
 	local force_caves = yappy.caves_everywhere
 	local ores_table = yappy.ores_table
 	
@@ -197,7 +197,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		if v.height_min <= maxp.y and v.height_max >= minp.y then
 			local chance = v.clust_scarcity
 			if chance >= 8*8 then
-				chance = v.clust_scarcity - ((v.height_max - mid_chunk) / 20)
+				chance = v.clust_scarcity - ((v.height_max - mid_chunk) / 10)
 				chance = math.max(chance, v.clust_scarcity * 0.75)
 			end
 			v.current_chance = math.floor(chance)
@@ -293,7 +293,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local node = data[vi]
 				local stones = yappy.stones
 				for i, v in ipairs(ores_table) do
-					if y <= v.height_max and y >= v.height_min then
+					if v.height_min <= y and v.height_max >= y then
 						local valid = (math.random(v.current_chance) == 1)
 						if valid then
 							if v.wherein == -1 then
