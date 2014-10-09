@@ -5,7 +5,6 @@ yappy.ores_table = {}
 yappy.scale				= 1
 yappy.terrain_scale		= 1
 yappy.details			= 0
-yappy.caves_everywhere	= true
 yappy.use_mudflow		= true
 yappy.tree_chance		= 14*14
 yappy.tree_max_chance	= 21*21
@@ -126,7 +125,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local temp = (nvals_temperature[nixz] + 0.3) * 38
 			
 			if mt_elev > 0 then
-				surf = surf + (mt_elev * 80)
+				surf = surf + (mt_elev * 75)
 			end
 			
 			if trees > 0.85 then
@@ -193,7 +192,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	local nixyz = 1
 	local mid_chunk = minp.y + (sidelen / 2)
-	local force_caves = yappy.caves_everywhere
 	local ores_table = yappy.ores_table
 	
 	for i, v in ipairs(ores_table) do
@@ -229,7 +227,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if cave > 0.93 and y < -20 and not (is_surface and temp < 5) then
 				-- Cave, filled with lava
 				data[vi] = yappy.c_lava
-			elseif cave < -0.7 and ((y - surf < -20) or (force_caves and y < surf + 2)) then
+			elseif cave < -0.7 and y <= surf + 1 then
 				-- Empty cave
 			elseif y == surf and y < 0 then
 				-- Sea ground
@@ -395,10 +393,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
 	vm:write_to_map(data)
-	if force_caves then
-		-- Let water flow into the caves
-		vm:update_liquids()
-	end
+	vm:update_liquids()
 	
 	local chugent = math.ceil((os.clock() - t1) * 1000)
 	print ("[yappy] "..minetest.pos_to_string(minp).." - "..chugent.." ms")

@@ -11,9 +11,6 @@ yappy.terrain_scale = 1
 -- Increase and decrease details. Lowest: -3, highest depends on CPU and memory [0]
 yappy.details = 0
 
--- Set to true if you want caves also at the surface (can look ugly) [true]
-yappy.caves_everywhere	= true
-
 -- To make ugly parts nicer! [true]
 yappy.use_mudflow		= true
 
