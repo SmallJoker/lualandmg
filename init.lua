@@ -19,8 +19,8 @@ end
 yappy.np_base = {
 	offset = 0,
 	scale = 1,
-	spread = {x=512, y=512, z=512},
-	octaves = 5,
+	spread = {x=256, y=256, z=256},
+	octaves = 4,
 	seed = 42692,
 	persist = 0.5
 }
@@ -28,7 +28,7 @@ yappy.np_base = {
 yappy.np_mountains = {
 	offset = 0,
 	scale = 1,
-	spread = {x=512, y=512, z=512},
+	spread = {x=192, y=192, z=192},
 	octaves = 4,
 	seed = 3853,
 	persist = 0.5
@@ -37,7 +37,7 @@ yappy.np_mountains = {
 yappy.np_trees = {
 	offset = 0,
 	scale = 1,
-	spread = {x=128, y=128, z=128},
+	spread = {x=64, y=64, z=64},
 	octaves = 2,
 	seed = -5432,
 	persist = 0.6
@@ -46,7 +46,7 @@ yappy.np_trees = {
 yappy.np_caves = {
 	offset = 0,
 	scale = 1,
-	spread = {x=24, y=16, z=24},
+	spread = {x=32, y=24, z=32},
 	octaves = 2,
 	seed = -11842,
 	persist = 0.7
@@ -120,20 +120,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if is_surface then
 		for z = minp.z, maxp.z do
 		for x = minp.x, maxp.x do
-			local surf = math.abs(nvals_base[nixz] * 25) - 2
+			local surf = nvals_base[nixz] * 20 + 16
 			local mt_elev = nvals_mountains[nixz] - 0.2
 			local trees = nvals_trees[nixz] + 0.4
 			local temp = (nvals_temperature[nixz] + 0.3) * 38
 			
 			if mt_elev > 0 then
-				surf = surf + (mt_elev * 90)
+				surf = surf + (mt_elev * 80)
 			end
 			
 			if trees > 0.85 then
 				trees = 0.85
 			end
 			
-			if trees > 0.5 then
+			if trees > 0.6 then
 				trees = yappy.tree_chance - (yappy.tree_chance * trees)
 			else
 				trees = yappy.tree_max_chance
@@ -171,8 +171,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 			end
 			
-			if temp > 33 and temp < 36 and math.random(5*5) == 2 then
+			local rand = math.random(5*5)
+			if temp > 33 and temp < 36 and rand == 2 then
 				c_top = yappy.c_jgrass
+			elseif temp > 0 and temp < 35 and rand == 3 then
+				c_top = yappy["grass_"..math.random(5)]
 			end
 			
 			surface[nixz] = {surf, trees, temp,
@@ -235,24 +238,27 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local placed = false
 				if trees > 2 and math.random(trees) == 2 then
 					if temp > 39 then
-						for i=1, math.random(4, 6) do
-							data[area:index(x, y + i, z)] = yappy.c_cactus
+						if trees % 2 == 0 then
+							for i = 1, math.random(4, 6) do
+								data[area:index(x, y + i, z)] = yappy.c_cactus
+							end
+							data[vi] = yappy.c_desert_sand
+							placed = true
 						end
-						data[vi] = yappy.c_desert_sand
-						placed = true
 					elseif x + 4 < maxp.x and 
 							x - 4 > minp.x and 
 							y + 10 < maxp.y and 
 							z + 4 < maxp.z and 
 							z - 4 > minp.z then
 						local tree_pos = vector.new(x, y + 1, z)
-						if temp > 35 then
+						if temp > 32 then
 							default.grow_jungletree(data, area, tree_pos, trees)
 							data[vi] = yappy.c_dirt
 							placed = true
-						elseif temp > 10 then
-							if math.random(20) > 2 then
-								default.grow_tree(data, area, tree_pos, math.random(20) > 14, trees)
+						elseif temp > 0 then
+							local rand = math.random(20)
+							if rand > 2 then
+								default.grow_tree(data, area, tree_pos, rand % 3 == 0, trees)
 							else
 								yappy.gen_oak_tree(x, y, z, area, data)
 							end

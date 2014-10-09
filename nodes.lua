@@ -28,6 +28,10 @@ yappy.c_desert_stone	=	minetest.get_content_id("default:desert_stone")
 yappy.c_cactus			=	minetest.get_content_id("default:cactus")
 yappy.c_dry_shrub		=	minetest.get_content_id("default:dry_shrub")
 
+for i = 1, 6 do
+	yappy["grass_"..i]	=	minetest.get_content_id("default:grass_"..i)
+end
+
 local trees = {
 	pine = {"Pine sapling", "skylands_pine_sapling.png", "Pine needles", "skylands_needles.png", "pine_needles", "pine_sapling", 3},
 	oak = {"Oak sapling", "yappy_oak_sapling.png", "Oak leaves", "yappy_oak_leaves.png", "oak_leaves", "oak_sapling", 4}

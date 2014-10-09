@@ -25,7 +25,7 @@ minetest.register_ore({
 	clust_num_ores	= 5,
 	clust_size		= 3,
 	height_min		= -31000,
-	height_max		= 64,
+	height_max		= -96,
 })
 
 minetest.register_ore({
@@ -45,7 +45,7 @@ minetest.register_ore({
 	clust_num_ores	= 5,
 	clust_size		= 3,
 	height_min		= -31000,
-	height_max		= 64,
+	height_max		= -64,
 })
 
 minetest.register_ore({
@@ -55,7 +55,7 @@ minetest.register_ore({
 	clust_num_ores	= 6,
 	clust_size		= 3,
 	height_min		= -255,
-	height_max		= 64,
+	height_max		= -64,
 })
 
 minetest.register_ore({
