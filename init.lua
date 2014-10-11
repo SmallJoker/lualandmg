@@ -193,6 +193,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local nixyz = 1
 	local mid_chunk = minp.y + (sidelen / 2)
 	local ores_table = yappy.ores_table
+	local mudflow_check = {}
 	
 	for i, v in ipairs(ores_table) do
 		if v.height_min <= maxp.y and v.height_max >= minp.y then
@@ -229,6 +230,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				data[vi] = yappy.c_lava
 			elseif cave < -0.7 and y <= surf + 1 then
 				-- Empty cave
+				if is_surface then
+					mudflow_check[nixz] = true
+				end
 			elseif y == surf and y < 0 then
 				-- Sea ground
 				data[vi] = c_under
@@ -330,62 +334,75 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	nixz = nixz + sidelen
 	end
 	
+	local t2 = os.clock()
+	local log_message = (minetest.pos_to_string(minp).." generated in "..
+			math.ceil((t2 - t1) * 1000).." ms")
+	
 	if yappy.use_mudflow and is_surface then
 		nixz = 1
+		local height = 2
 		for z = minp.z, maxp.z do
 		for x = minp.x, maxp.x do
-			local cache = surface[nixz]
-			local surf, c_stone, c_under, c_above = cache[1], cache[4], cache[5], cache[6]
-			
-			-- out of range
-			if surf - 16 > maxp.y then
-				surf = minp.y + 1
-			end
-			
-			-- node at surface got removed
-			local vi = area:index(x, surf, z)
-			local node = data[vi]
-			
-			local max_depth = 5
-			local ground, depth = 6.66, 0
-			local covered = false
-			for y = surf, minp.y + 1, -1 do
-				vi = area:index(x, y, z)
-				node = data[vi]
-				local is_air = (node == yappy.c_air)
+			if mudflow_check[nixz] then
+				local cache = surface[nixz]
+				local r_surf = cache[1]
+				local surf = r_surf + height
+				local c_stone, c_under, c_above =  cache[4], cache[5], cache[6]
 				
-				if node == yappy.c_water then
-					break
+				-- out of range
+				if r_surf - 16 > maxp.y then
+					surf = minp.y + 1
 				end
 				
-				if depth >= max_depth then
-					ground = y + max_depth
-					break
-				end
-				
-				if is_air then
-					if depth > 0 then
-						covered = true
-						data[vi] = c_stone
+				-- node at surface got removed
+				local max_depth = 5
+				local ground, depth = 6.66, 0
+				local covered, water = false, false
+				for y = surf, minp.y + 1, -1 do
+					vi = area:index(x, y, z)
+					node = data[vi]
+					local is_air = (node == yappy.c_air)
+					
+					if node == yappy.c_water then
+						water = true
 					end
-					depth = 0
-				else
-					depth = depth + 1
+					
+					if depth >= max_depth then
+						ground = y + max_depth
+						break
+					end
+					
+					if is_air then
+						if water then
+							data[vi] = yappy.c_water
+						elseif depth > 0 then
+							covered = true
+							data[vi] = c_stone
+						end
+						depth = 0
+					elseif y <= r_surf then
+						depth = depth + 1
+					end
 				end
-			end
-			
-			if ground ~= 6.66 and ground ~= surf then
-				vi = area:index(x, ground, z)
-				if ground >= 0 and not covered then
-					data[vi] = c_above
-				else
+				
+				if ground ~= 6.66 and ground ~= surf then
+					vi = area:index(x, ground, z)
+					if ground >= 0 and not covered then
+						data[vi] = c_above
+					else
+						data[vi] = c_under
+					end
+					vi = area:index(x, ground - 1, z)
 					data[vi] = c_under
 				end
-				vi = area:index(x, ground - 1, z)
-				data[vi] = c_under
 			end
 			nixz = nixz + 1
 		end
+		end
+		
+		local td = math.ceil((os.clock() - t2) * 1000)
+		if td > 0 then
+			log_message = log_message..", mudflow in "..td.."ms"
 		end
 	end
 	
@@ -394,7 +411,5 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:calc_lighting()
 	vm:write_to_map(data)
 	vm:update_liquids()
-	
-	local chugent = math.ceil((os.clock() - t1) * 1000)
-	print ("[yappy] "..minetest.pos_to_string(minp).." - "..chugent.." ms")
+	minetest.log("action", log_message)
 end)
