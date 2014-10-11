@@ -1,36 +1,9 @@
 yappy.c_air		=	minetest.get_content_id("air")
-yappy.c_grass	=	minetest.get_content_id("default:dirt_with_grass")
-yappy.c_dirt	=	minetest.get_content_id("default:dirt")
-yappy.c_gravel	=	minetest.get_content_id("default:gravel")
-yappy.c_stone	=	minetest.get_content_id("default:stone")
 yappy.c_water	=	minetest.get_content_id("default:water_source")
 yappy.c_lava	=	minetest.get_content_id("default:lava_source")
-yappy.c_clay	=	minetest.get_content_id("default:clay")
-yappy.c_jgrass	=	minetest.get_content_id("default:junglegrass")
-
-yappy.c_sdiamond	=	minetest.get_content_id("default:stone_with_diamond")
-yappy.c_smese		=	minetest.get_content_id("default:stone_with_mese")
-yappy.c_sgold		=	minetest.get_content_id("default:stone_with_gold")
-yappy.c_scopper		=	minetest.get_content_id("default:stone_with_copper")
-yappy.c_siron		=	minetest.get_content_id("default:stone_with_iron")
-yappy.c_scoal		=	minetest.get_content_id("default:stone_with_coal")
-
-yappy.c_snow		=	minetest.get_content_id("default:snow")
-yappy.c_snowblock	=	minetest.get_content_id("default:snowblock")
-yappy.c_ice			=	minetest.get_content_id("default:ice")
-yappy.c_dirt_snow	=	minetest.get_content_id("default:dirt_with_snow")
-
-yappy.c_sand		=	minetest.get_content_id("default:sand")
-yappy.c_sandstone	=	minetest.get_content_id("default:sandstone")
-
-yappy.c_desert_sand		=	minetest.get_content_id("default:desert_sand")
-yappy.c_desert_stone	=	minetest.get_content_id("default:desert_stone")
-yappy.c_cactus			=	minetest.get_content_id("default:cactus")
-yappy.c_dry_shrub		=	minetest.get_content_id("default:dry_shrub")
-
-for i = 1, 6 do
-	yappy["grass_"..i]	=	minetest.get_content_id("default:grass_"..i)
-end
+yappy.c_stone	=	minetest.get_content_id("default:stone")
+yappy.c_ice		=	minetest.get_content_id("default:ice")
+yappy.c_cactus	=	minetest.get_content_id("default:cactus")
 
 local trees = {
 	pine = {"Pine sapling", "skylands_pine_sapling.png", "Pine needles", "skylands_needles.png", "pine_needles", "pine_sapling", 3},
