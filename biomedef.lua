@@ -55,7 +55,7 @@ yappy.register_tree({
 yappy.register_tree({
 	temperature_min = 25,
 	temperature_max = 35,
-	chance = 10*10,
+	chance = 6*6,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
 		default.grow_jungletree(data, area, pos, seed)
@@ -65,7 +65,7 @@ yappy.register_tree({
 yappy.register_tree({
 	temperature_min = 5,
 	temperature_max = 30,
-	chance = 15*15,
+	chance = 12*12,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
 		default.grow_tree(data, area, pos, seed % 3 == 0, seed)
@@ -75,7 +75,7 @@ yappy.register_tree({
 yappy.register_tree({
 	temperature_min = 20,
 	temperature_max = 35,
-	chance = 25*25,
+	chance = 20*20,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
 		yappy.gen_oak_tree(pos.x, pos.y, pos.z, area, data)
@@ -85,7 +85,7 @@ yappy.register_tree({
 yappy.register_tree({
 	temperature_min = -15,
 	temperature_max = 10,
-	chance = 12*12,
+	chance = 10*10,
 	node_under = {"default:dirt_with_grass", "default:dirt_with_snow"},
 	action = function(pos, data, area, seed)
 		yappy.gen_pine_tree(pos.x, pos.y, pos.z, area, data)

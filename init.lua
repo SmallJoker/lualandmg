@@ -170,9 +170,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			
 			local tree_factor = 1
 			if tree_chance > 0.4 then
-				tree_factor = 0.5
+				tree_factor = 0.4
 			elseif tree_chance < -0.4 then
-				tree_factor = 1.6
+				tree_factor = 2
 			end
 			
 			for i, v in ipairs(trees) do
