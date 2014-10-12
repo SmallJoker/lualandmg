@@ -159,7 +159,7 @@ end
 
 function yappy.gen_oak_tree(x, y, z, area, data)
 	local c_air = minetest.get_content_id("air")
-	local c_tree = minetest.get_content_id("default:tree")
+	local c_tree = minetest.get_content_id("yappy:oak_trunk")
 	local c_leaves = minetest.get_content_id("yappy:oak_leaves")
 	for h = 0, 10 do
 		local s = 0
@@ -201,7 +201,7 @@ end
 -- original source: https://raw.githubusercontent.com/HeroOfTheWinds/skylands-master/master/functions.lua
 function yappy.gen_pine_tree(x, y, z, area, data)
 	local c_air = minetest.get_content_id("air")
-	local c_tree = minetest.get_content_id("default:tree")
+	local c_tree = minetest.get_content_id("yappy:pine_trunk")
 	local c_needles = minetest.get_content_id("yappy:pine_needles")
 	for h = 0, 11 do
 		if h % 3 <= 1 and h > 2 then
@@ -231,49 +231,3 @@ function yappy.gen_pine_tree(x, y, z, area, data)
 		end
 	end
 end
-
-minetest.register_abm({
-	nodenames = {"yappy:pine_sapling"},
-	interval = 40,
-	chance = 40,
-	action = function(pos, node)
-		local nu = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name
-		if minetest.get_item_group(nu, "soil") == 0 then
-			return
-		end
-		minetest.remove_node(pos)
-		local vm = minetest.get_voxel_manip()
-		local emin, emax = vm:read_from_map(
-			{x=pos.x-4, y=pos.y-1, z=pos.z-4}, 
-			{x=pos.x+4, y=pos.y+14, z=pos.z+4})
-		local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
-		local data = vm:get_data()
-		yappy.gen_pine_tree(pos.x, pos.y - 1, pos.z, area, data)
-		vm:set_data(data)
-		vm:write_to_map()
-		vm:update_map()
-	end
-})
-
-minetest.register_abm({
-	nodenames = {"yappy:oak_sapling"},
-	interval = 40,
-	chance = 40,
-	action = function(pos, node)
-		local nu = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name
-		if minetest.get_item_group(nu, "soil") == 0 then
-			return
-		end
-		minetest.remove_node(pos)
-		local vm = minetest.get_voxel_manip()
-		local emin, emax = vm:read_from_map(
-			{x=pos.x-6, y=pos.y-1, z=pos.z-6}, 
-			{x=pos.x+6, y=pos.y+14, z=pos.z+6})
-		local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
-		local data = vm:get_data()
-		yappy.gen_oak_tree(pos.x, pos.y - 1, pos.z, area, data)
-		vm:set_data(data)
-		vm:write_to_map()
-		vm:update_map()
-	end
-})
