@@ -100,7 +100,7 @@ yappy.register_decoration({
 	chance = 8*8
 })
 
-for i = 1, 6 do
+for i = 1, 5 do
 	yappy.register_decoration({
 		temperature_min = 0,
 		temperature_max = 34,
