@@ -92,7 +92,9 @@ minetest.register_on_mapgen_init(function(mgparams)
 	end
 end)
 
-minetest.register_on_generated(function(minp, maxp, seed)
+
+
+table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 	local is_surface = maxp.y > -80
 	
 	local t1 = os.clock()

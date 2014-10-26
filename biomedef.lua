@@ -42,19 +42,6 @@ yappy.register_biome({
 end
 
 yappy.register_tree({
-	temperature_min = 36,
-	temperature_max = 54,
-	chance = 20*20,
-	node_under = {"default:sand", "default:desert_sand"},
-	action = function(pos, data, area, seed)
-		local x, y, z = pos.x, pos.y, pos.z
-		for i = 0, math.random(3, 5) do
-			data[area:index(x, y + i, z)] = yappy.c_cactus
-		end
-	end
-})
-
-yappy.register_tree({
 	temperature_min = 25,
 	temperature_max = 35,
 	chance = 6*6,
@@ -95,27 +82,9 @@ yappy.register_tree({
 })
 
 yappy.register_decoration({
-	temperature_min = 33,
+	temperature_min = 30,
 	temperature_max = 36,
 	name = "default:junglegrass",
 	node_under = "default:dirt_with_grass",
 	chance = 8*8
-})
-
-for i = 1, 5 do
-	yappy.register_decoration({
-		temperature_min = 0,
-		temperature_max = 34,
-		name = "default:grass_"..i,
-		node_under = "default:dirt_with_grass",
-		chance = 7*7
-	})
-end
-
-yappy.register_decoration({
-	temperature_min = 35,
-	temperature_max = 47,
-	name = "default:dry_shrub",
-	node_under = {"default:dirt_with_grass", "default:sand", "default:desert_sand"},
-	chance = 10*10
 })
