@@ -21,6 +21,7 @@ yappy.register_biome({
 	temperature_min = -5
 })
 
+if yappy.generate_snow then
 yappy.register_biome({
 	temperature_min = -10,
 	cover = "default:dirt_with_snow"
@@ -38,6 +39,7 @@ yappy.register_biome({
 	middle = "default:snowblock",
 	cover = "default:snowblock"
 })
+end
 
 yappy.register_tree({
 	temperature_min = 36,

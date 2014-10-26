@@ -7,11 +7,17 @@ yappy.details			= 0
 yappy.use_mudflow		= true
 yappy.tree_chance		= 14*14
 yappy.tree_max_chance	= 21*21
+yappy.generate_snow		= true
 
 local file = io.open(yappy.settings_file, "r")
 if file then
 	io.close(file)
 	dofile(yappy.settings_file)
+end
+
+-- Carbone special
+if minetest.setting_getbool("generate_snow") ~= nil then
+	yappy.generate_snow = minetest.setting_getbool("generate_snow")
 end
 
 yappy.np_base = {
@@ -145,7 +151,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local c_stone, c_middle, c_cover, c_top
 			
 			for i, v in ipairs(biomes) do
-				if temp > v.temperature_min then
+				if temp > v.temperature_min or i == #biomes then
 					c_stone = v.stone
 					c_middle = v.middle
 					c_cover = v.cover
