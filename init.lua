@@ -107,6 +107,7 @@ table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 	local trees = yappy.trees
 	local biomes = yappy.biomes
 	local decorations = yappy.decorations
+	local stones = yappy.stones
 	local surface = {}
 	local mudflow_check = {}
 	
@@ -277,7 +278,6 @@ table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 			
 			if y <= surf then
 				local node = data[vi]
-				local stones = yappy.stones
 				for i, v in ipairs(ores) do
 					if v.height_min <= y and v.height_max >= y then
 						local valid = (math.random(v.current_chance) == 1)
@@ -293,10 +293,14 @@ table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 							break
 						end
 						if valid then
+							local size = v.clust_size
+							if size >= 3 then
+								size = size + math.random(2) - 2
+							end
 							if v.ore_type == "scatter" then
-								yappy.gen_ores(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
+								yappy.gen_ores(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, size)
 							elseif v.ore_type == "sheet" then
-								yappy.gen_sheet(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, v.clust_size)
+								yappy.gen_sheet(data, area, {x=x, y=y, z=z}, v.ore, v.wherein, size)
 							end
 							break
 						end

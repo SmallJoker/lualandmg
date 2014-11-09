@@ -82,7 +82,7 @@ minetest.register_ore({
 minetest.register_ore({
 	ore_type		= "sheet",
 	ore				= "default:gravel",
-	clust_scarcity	= 30*30*30,
+	clust_scarcity	= 25*25*25,
 	clust_num_ores	= 6,
 	clust_size		= 5,
 	height_min		= -6000,
