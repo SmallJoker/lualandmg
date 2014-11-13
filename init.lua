@@ -53,7 +53,8 @@ yappy.np_caves = {
 	spread = {x=32, y=24, z=32},
 	octaves = 2,
 	seed = -11842,
-	persist = 0.7
+	persist = 0.7,
+	eased = true
 }
 
 -- A value between: 60.0 and -50.0
