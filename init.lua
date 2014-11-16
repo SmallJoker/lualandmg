@@ -233,10 +233,10 @@ table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 				c_top = cache[7]
 			end
 			local cave = nvals_caves[nixyz]
-			if cave > 0.93 and y < -20 and not (is_surface and temp < 5) then
+			if cave > 0.95 and y < -20 and not (is_surface and temp < 5) then
 				-- Cave, filled with lava
 				data[vi] = yappy.c_lava
-			elseif cave < -0.7 and y <= surf + 1 then
+			elseif cave < -0.72 and y <= surf + 1 then
 				-- Empty cave
 				if is_surface then
 					mudflow_check[nixz] = true
