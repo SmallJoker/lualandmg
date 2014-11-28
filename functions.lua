@@ -19,6 +19,14 @@ minetest.after(1, function()
 			#yappy.decorations.." decorations")
 end)
 
+function vector.floor(v)
+	return {
+		x = math.floor(v.x),
+		y = math.floor(v.y),
+		z = math.floor(v.z)
+	}
+end
+
 function yappy.register_tree(treedef)
 	treedef.node_under = yappy.get_content_id(treedef.node_under)
 	table.insert(yappy.trees, treedef)

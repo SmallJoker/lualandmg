@@ -93,9 +93,22 @@ minetest.register_on_mapgen_init(function(mgparams)
 	end
 end)
 
+minetest.register_chatcommand("regenerate", {
+	description = "Regenerates 32^3 nodes around you",
+	privs = {server=true},
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		local pos = vector.floor(vector.divide(player:getpos(), 32))
+		local minp = vector.multiply(pos, 32)
+		local maxp = vector.multiply(vector.add(pos, 1), 32)
+		maxp = vector.subtract(maxp, 1)
+		
+		yappy.generate(minp, maxp, math.random(0,9999), true)
+		minetest.chat_send_player(name, "Done!")
+	end
+})
 
-
-table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
+function yappy.generate(minp, maxp, seed, regen)
 	local is_surface = maxp.y > -80
 	
 	local t1 = os.clock()
@@ -206,11 +219,31 @@ table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 		nixz = 1
 	end
 	
-	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+	local vm, emin, emax
+	if regen then
+		vm = minetest.get_voxel_manip()
+		emin, emax = vm:read_from_map(minp, maxp)
+	else
+		vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+	end
+	
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 	local data = vm:get_data()
-	local nvals_caves = minetest.get_perlin_map(yappy.np_caves, chulens):get3dMap_flat(minp)
 	
+	if regen then
+		local air = yappy.c_air
+		for z = minp.z, maxp.z do
+		for y = minp.y, maxp.y do
+			local vi = area:index(minp.x, y, z)
+			for x = minp.x, maxp.x do
+				data[vi] = air
+				vi = vi + 1
+			end
+		end
+		end
+	end
+	
+	local nvals_caves = minetest.get_perlin_map(yappy.np_caves, chulens):get3dMap_flat(minp)
 	local nixyz = 1
 	
 	for z = minp.z, maxp.z do
@@ -339,6 +372,7 @@ table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 				
 				-- node at surface got removed
 				local max_depth = 5
+				local vi, node
 				local ground, depth = 6.66, 0
 				local covered, water = false, false
 				for y = surf, minp.y + 1, -1 do
@@ -390,9 +424,16 @@ table.insert(minetest.registered_on_generateds, 1, function(minp, maxp, seed)
 	end
 	
 	vm:set_data(data)
-	vm:set_lighting({day=0, night=0})
+	if not regen then
+		vm:set_lighting({day=0, night=0})
+	end
 	vm:calc_lighting()
 	vm:write_to_map(data)
 	vm:update_liquids()
+	if regen then
+		vm:update_map()
+	end
 	minetest.log("action", log_message)
-end)
+end
+
+table.insert(minetest.registered_on_generateds, 1, yappy.generate)
