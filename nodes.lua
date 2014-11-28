@@ -8,13 +8,13 @@ yappy.c_cactus	=	minetest.get_content_id("default:cactus")
 local trees = {
 	pine = {
 		sapling = "skylands_pine_sapling.png", 
-		leaves = {"skylands_needles.png", "needles", 3},
+		leaves = {"skylands_needles.png", "needles", 3, 30},
 		wood = "moretrees_pine_wood.png",
 		trunk = {"moretrees_pine_trunk.png", "moretrees_pine_trunk_top.png"}
 	},
 	oak = {
 		sapling = "yappy_oak_sapling.png",
-		leaves = {"yappy_oak_leaves.png", "leaves", 4},
+		leaves = {"yappy_oak_leaves.png", "leaves", 4, 40},
 		wood = "moretrees_oak_wood.png",
 		trunk = {"moretrees_oak_trunk.png", "moretrees_oak_trunk_top.png"}
 	}
@@ -35,7 +35,7 @@ for k, v in pairs(trees) do
 		drop = {
 			max_items = 1,
 			items = {
-				{items = {"yappy:"..k.."_sapling"}, rarity = 40},
+				{items = {"yappy:"..k.."_sapling"}, rarity = v.leaves[4]},
 				{items = { leaves }}
 			}
 		},
