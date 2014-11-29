@@ -51,11 +51,11 @@ minetest.register_ore({
 minetest.register_ore({
 	ore				= "default:stone_with_diamond",
 	wherein			= "default:stone",
-	clust_scarcity	= 17*17*17,
-	clust_num_ores	= 6,
+	clust_scarcity	= 15*15*15,
+	clust_num_ores	= 4,
 	clust_size		= 3,
-	height_min		= -255,
-	height_max		= -64,
+	height_min		= -31000,
+	height_max		= -256,
 })
 
 minetest.register_ore({
