@@ -95,16 +95,25 @@ end)
 
 minetest.register_chatcommand("regenerate", {
 	description = "Regenerates 32^3 nodes around you",
+	params = "<size * 8>",
 	privs = {server=true},
 	func = function(name, param)
-		local player = minetest.get_player_by_name(name)
-		local pos = vector.floor(vector.divide(player:getpos(), 32))
-		local minp = vector.multiply(pos, 32)
-		local maxp = vector.multiply(vector.add(pos, 1), 32)
-		maxp = vector.subtract(maxp, 1)
+		local size = tonumber(param) or 4 -- default 4*8, 32
 		
-		yappy.generate(minp, maxp, math.random(0,9999), true)
-		minetest.chat_send_player(name, "Done!")
+		if size > 8 then
+			size = 8
+		elseif size < 1 then
+			return false, "Nothing to do."
+		end
+		
+		size = size * 8
+		local player = minetest.get_player_by_name(name)
+		local pos = vector.floor(vector.divide(player:getpos(), size))
+		local minp = vector.multiply(pos, size)
+		local maxp = vector.add(minp, size - 1)
+		
+		yappy.generate(minp, maxp, math.random(0, 9999), true)
+		return true, "Done!"
 	end
 })
 
