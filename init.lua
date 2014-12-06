@@ -94,14 +94,14 @@ minetest.register_on_mapgen_init(function(mgparams)
 end)
 
 minetest.register_chatcommand("regenerate", {
-	description = "Regenerates 32^3 nodes around you",
+	description = "Regenerates <size * 8>^3 nodes around you",
 	params = "<size * 8>",
 	privs = {server=true},
 	func = function(name, param)
-		local size = tonumber(param) or 4 -- default 4*8, 32
+		local size = tonumber(param) or 1
 		
 		if size > 8 then
-			size = 8
+			size = 8 -- Limit: 8*8 -> 64
 		elseif size < 1 then
 			return false, "Nothing to do."
 		end
