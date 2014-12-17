@@ -54,6 +54,7 @@ yappy.np_caves = {
 	octaves = 2,
 	seed = -11842,
 	persist = 0.7,
+	flags = eased,
 	eased = true
 }
 
