@@ -288,12 +288,7 @@ function yappy.generate(minp, maxp, seed, regen)
 				-- Sea ground
 				data[vi] = c_middle
 			elseif y == surf then
-				if tree > 0 and
-						x + 4 < maxp.x and 
-						x - 4 > minp.x and 
-						y + 10 < maxp.y and 
-						z + 4 < maxp.z and 
-						z - 4 > minp.z then
+				if tree > 0 then
 					trees[tree - 1].action(vector.new(x, y + 1, z), data, area, seed)
 					data[vi] = c_middle
 				else
