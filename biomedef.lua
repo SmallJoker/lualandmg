@@ -43,11 +43,11 @@ end
 
 yappy.register_tree({
 	temperature_min = 25,
-	temperature_max = 35,
+	temperature_max = 38,
 	chance = 6*6,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
-		default.grow_jungletree(data, area, pos, seed)
+		yappy.grow_jungletree(pos.x, pos.y, pos.z, area, data, seed)
 	end
 })
 
@@ -57,7 +57,7 @@ yappy.register_tree({
 	chance = 12*12,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
-		default.grow_tree(data, area, pos, seed % 3 == 0, seed)
+		yappy.grow_tree(pos.x, pos.y, pos.z, area, data, seed % 3 == 0, seed)
 	end
 })
 

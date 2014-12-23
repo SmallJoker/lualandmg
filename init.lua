@@ -70,6 +70,7 @@ yappy.np_temperature = {
 
 dofile(yappy.mod_path.."/nodes.lua")
 dofile(yappy.mod_path.."/functions.lua")
+dofile(yappy.mod_path.."/treegen.lua")
 dofile(yappy.mod_path.."/biomedef.lua")
 dofile(yappy.mod_path.."/default_mapgen.lua")
 
