@@ -84,7 +84,6 @@ end
 function yappy.grow_tree(x, y, z, area, data, is_apple_tree, seed)
 	local pr = PseudoRandom(seed)
 	local th = pr:next(4, 6)
-	local x, y, z = pos.x, pos.y, pos.z
 	for yy = y, y+th-1 do
 		local vi = area:index(x, yy, z)
 		if area:contains(x, yy, z) and (data[vi] == c_air or yy == y) then
