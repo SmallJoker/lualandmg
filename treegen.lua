@@ -12,6 +12,7 @@ local c_leaves = minetest.get_content_id("default:leaves")
 local c_apple = minetest.get_content_id("default:apple")
 
 function yappy.gen_oak_tree(x, y, z, area, data)
+	local node
 	for h = 0, 10 do
 		local s = 0
 		if h == 3 then
@@ -25,12 +26,13 @@ function yappy.gen_oak_tree(x, y, z, area, data)
 			for k = -s, s do
 				local sum = math.abs(i) + math.abs(k)
 				if sum <= s and sum ~= 0 then
+					node = data[vil]
 					if sum ~= s and sum == (h - 4) and math.random(4) > 1 then
-						if data[vil] == c_air then
+						if node == c_air or node == c_ignore then
 							data[vil] = c_oak_tree
 						end
 					elseif math.random(6) > 1 then
-						if data[vil] == c_air then
+						if node == c_air or node == c_ignore then
 							data[vil] = c_oak_leaves
 						end
 					end
@@ -43,7 +45,8 @@ function yappy.gen_oak_tree(x, y, z, area, data)
 			middle = c_oak_leaves
 		end
 		local vil = area:index(x, y + h, z)
-		if data[vil] == c_air then
+		node = data[vil]
+		if node == c_air or node == c_ignore then
 			data[vil] = middle
 		end
 	end
@@ -51,6 +54,7 @@ end
 
 -- original source: https://raw.githubusercontent.com/HeroOfTheWinds/skylands-master/master/functions.lua
 function yappy.gen_pine_tree(x, y, z, area, data)
+	local node
 	for h = 0, 11 do
 		if h % 3 <= 1 and h > 2 then
 			local s = 1
@@ -61,7 +65,8 @@ function yappy.gen_pine_tree(x, y, z, area, data)
 				local vil = area:index(x - s, y + h, z + i)
 				for k = -s, s do
 					if not (i == 0 and k == 0) and math.random(10) > 2 then
-						if data[vil] == c_air then
+						node = data[vil]
+						if node == c_air or node == c_ignore then
 							data[vil] = c_pine_needles
 						end
 					end
@@ -74,7 +79,8 @@ function yappy.gen_pine_tree(x, y, z, area, data)
 			middle = c_pine_needles
 		end
 		local vil = area:index(x, y + h, z)
-		if data[vil] == c_air then
+		node = data[vil]
+		if node == c_air or node == c_ignore then
 			data[vil] = middle
 		end
 	end
