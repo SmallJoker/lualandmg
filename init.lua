@@ -430,6 +430,9 @@ function yappy.generate(minp, maxp, seed, regen)
 	end
 	
 	vm:set_data(data)
+	if regen then
+		vm:set_param2_data({})
+	end
 	if not regen then
 		vm:set_lighting({day=0, night=0})
 	end
