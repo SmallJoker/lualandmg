@@ -101,32 +101,38 @@ minetest.register_chatcommand("regenerate", {
 	privs = {server=true},
 	func = function(name, param)
 		local size = tonumber(param) or 1
-		
+
 		if size > 8 then
 			size = 8 -- Limit: 8*8 -> 64
 		elseif size < 1 then
 			return false, "Nothing to do."
 		end
-		
+
 		size = size * 8
 		local player = minetest.get_player_by_name(name)
 		local pos = vector.floor(vector.divide(player:getpos(), size))
 		local minp = vector.multiply(pos, size)
 		local maxp = vector.add(minp, size - 1)
-		
+
 		yappy.generate(minp, maxp, math.random(0, 9999), true)
 		return true, "Done!"
 	end
 })
 
+yappy.pm_sidelen = nil
+yappy.pm_base = nil
+yappy.pm_mountains = nil
+yappy.pm_trees = nil
+yappy.pm_temperature = nil
+
 function yappy.generate(minp, maxp, seed, regen)
 	local is_surface = maxp.y > -80
-	
+
 	local t1 = os.clock()
 	local sidelen = maxp.x - minp.x + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
 	local mid_chunk = minp.y + (sidelen / 2)
-	
+
 	local terrain_scale = yappy.terrain_scale
 	local ores = yappy.ores
 	local trees = yappy.trees
@@ -135,15 +141,23 @@ function yappy.generate(minp, maxp, seed, regen)
 	local stones = yappy.stones
 	local surface = {}
 	local mudflow_check = {}
-	
+
 	local nvals_base, nvals_mountains, nvals_trees, nvals_temp
 	if is_surface then
-		nvals_base = minetest.get_perlin_map(yappy.np_base, chulens):get2dMap_flat({x=minp.x, y=minp.z})
-		nvals_mountains = minetest.get_perlin_map(yappy.np_mountains, chulens):get2dMap_flat({x=minp.x, y=minp.z})
-		nvals_trees = minetest.get_perlin_map(yappy.np_trees, chulens):get2dMap_flat({x=minp.x, y=minp.z})
-		nvals_temp = minetest.get_perlin_map(yappy.np_temperature, chulens):get2dMap_flat({x=minp.x, y=minp.z})
+		if yappy.pm_sidelen ~= sidelen then
+			yappy.pm_base = minetest.get_perlin_map(yappy.np_base, chulens)
+			yappy.pm_mountains = minetest.get_perlin_map(yappy.np_mountains, chulens)
+			yappy.pm_trees = minetest.get_perlin_map(yappy.np_trees, chulens)
+			yappy.pm_temperature = minetest.get_perlin_map(yappy.np_temperature, chulens)
+			yappy.pm_sidelen = sidelen
+		end
+
+		nvals_base = yappy.pm_base:get2dMap_flat({x=minp.x, y=minp.z})
+		nvals_mountains = yappy.pm_mountains:get2dMap_flat({x=minp.x, y=minp.z})
+		nvals_trees = yappy.pm_trees:get2dMap_flat({x=minp.x, y=minp.z})
+		nvals_temp = yappy.pm_temperature:get2dMap_flat({x=minp.x, y=minp.z})
 	end
-	
+
 	for i, v in ipairs(ores) do
 		if v.height_min <= maxp.y and v.height_max >= minp.y then
 			local chance = v.clust_scarcity
@@ -154,7 +168,8 @@ function yappy.generate(minp, maxp, seed, regen)
 			v.current_chance = math.floor(chance)
 		end
 	end
-	
+
+	-- Pre-calculate terrain height, biome and trees
 	local nixz = 1
 	if is_surface then
 		for z = minp.z, maxp.z do
@@ -165,19 +180,19 @@ function yappy.generate(minp, maxp, seed, regen)
 			local temp = (nvals_temp[nixz] + 0.4) * 44
 			temp = math.floor((temp * 4) + 0.5) / 4
 			local r_temp, tree = temp, 0
-			
+
 			if mt_elev > 0 then
 				surf = surf + (mt_elev * 75)
 			end
-			
+
 			if surf < 0 then
 				surf = surf * 2.5
 			end
-			
+
 			surf = math.floor((surf * terrain_scale) + 0.5)
 			temp = temp + math.random(-3, 3)
 			local c_stone, c_middle, c_cover, c_top
-			
+
 			for i, v in ipairs(biomes) do
 				if temp > v.temperature_min or i == #biomes then
 					c_stone = v.stone
@@ -187,13 +202,13 @@ function yappy.generate(minp, maxp, seed, regen)
 					break
 				end
 			end
-			
+
 			if c_top == 0 then
 				for i, v in ipairs(decorations) do
 					if temp >= v.temperature_min and
 							temp <= v.temperature_max and
 							(v.chance <= 1 or math.random(v.chance) == 1) then
-						
+
 						if yappy.is_valid_ground(v.node_under, c_cover) then
 							c_top = v.name
 							break
@@ -201,19 +216,19 @@ function yappy.generate(minp, maxp, seed, regen)
 					end
 				end
 			end
-			
+
 			local tree_factor = 1
 			if tree_chance > 0.4 then
 				tree_factor = 0.4
 			elseif tree_chance < -0.4 then
 				tree_factor = 2
 			end
-			
+
 			for i, v in ipairs(trees) do
 				if temp >= v.temperature_min and
 						temp <= v.temperature_max and
 						math.random(math.ceil(v.chance * tree_factor)) == 1 then
-					
+
 					if yappy.is_valid_ground(v.node_under, c_cover) then
 						tree = i + 1
 						c_top = 0
@@ -221,7 +236,7 @@ function yappy.generate(minp, maxp, seed, regen)
 					end
 				end
 			end
-			
+
 			surface[nixz] = {surf, tree, r_temp,
 					c_stone, c_middle, c_cover, c_top}
 			nixz = nixz + 1
@@ -229,7 +244,7 @@ function yappy.generate(minp, maxp, seed, regen)
 		end
 		nixz = 1
 	end
-	
+
 	local vm, emin, emax
 	if regen then
 		vm = minetest.get_voxel_manip()
@@ -237,10 +252,10 @@ function yappy.generate(minp, maxp, seed, regen)
 	else
 		vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	end
-	
+
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 	local data = vm:get_data()
-	
+
 	if regen then
 		local air = yappy.c_air
 		for z = minp.z, maxp.z do
@@ -253,10 +268,10 @@ function yappy.generate(minp, maxp, seed, regen)
 		end
 		end
 	end
-	
+
 	local nvals_caves = minetest.get_perlin_map(yappy.np_caves, chulens):get3dMap_flat(minp)
 	local nixyz = 1
-	
+
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
 		local vi = area:index(minp.x, y, z)
@@ -264,13 +279,13 @@ function yappy.generate(minp, maxp, seed, regen)
 			local surf, tree, temp = 0, 0, 0
 			local c_stone = yappy.c_stone
 			local c_middle, c_cover, c_top = 0, 0, 0
-			
+
 			if is_surface then
 				local cache = surface[nixz]
 				surf = cache[1]
 				tree = cache[2]
 				temp = cache[3]
-				
+
 				c_stone = cache[4]
 				c_middle = cache[5]
 				c_cover = cache[6]
@@ -315,7 +330,7 @@ function yappy.generate(minp, maxp, seed, regen)
 			elseif y < surf then
 				data[vi] = c_stone
 			end
-			
+
 			if y <= surf then
 				local node = data[vi]
 				for i, v in ipairs(ores) do
@@ -355,11 +370,11 @@ function yappy.generate(minp, maxp, seed, regen)
 	end
 	nixz = nixz + sidelen
 	end
-	
+
 	local t2 = os.clock()
 	local log_message = (minetest.pos_to_string(minp).." generated in "..
 			math.ceil((t2 - t1) * 1000).." ms")
-	
+
 	if yappy.use_mudflow and is_surface then
 		nixz = 1
 		local height = 2
@@ -370,12 +385,12 @@ function yappy.generate(minp, maxp, seed, regen)
 				local r_surf = cache[1]
 				local surf = r_surf + height
 				local c_stone, c_middle, c_cover = cache[4], cache[5], cache[6]
-				
+
 				-- out of range
 				if r_surf - 16 > maxp.y then
 					surf = minp.y + 1
 				end
-				
+
 				-- node at surface got removed
 				local max_depth = 5
 				local vi, node
@@ -385,16 +400,16 @@ function yappy.generate(minp, maxp, seed, regen)
 					vi = area:index(x, y, z)
 					node = data[vi]
 					local is_air = (node == yappy.c_air)
-					
+
 					if node == yappy.c_water then
 						water = true
 					end
-					
+
 					if depth >= max_depth then
 						ground = y + max_depth
 						break
 					end
-					
+
 					if is_air then
 						if water then
 							data[vi] = yappy.c_water
@@ -407,7 +422,7 @@ function yappy.generate(minp, maxp, seed, regen)
 						depth = depth + 1
 					end
 				end
-				
+
 				if ground ~= 6.66 and ground ~= surf then
 					vi = area:index(x, ground, z)
 					if ground >= 0 and not covered then
@@ -422,13 +437,13 @@ function yappy.generate(minp, maxp, seed, regen)
 			nixz = nixz + 1
 		end
 		end
-		
+
 		local td = math.ceil((os.clock() - t2) * 1000)
 		if td > 0 then
 			log_message = log_message..", mudflow in "..td.."ms"
 		end
 	end
-	
+
 	vm:set_data(data)
 	if regen then
 		vm:set_param2_data({})
