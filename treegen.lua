@@ -1,17 +1,19 @@
 local c_air = minetest.get_content_id("air")
 local c_ignore = minetest.get_content_id("ignore")
-local c_oak_tree = minetest.get_content_id("yappy:oak_trunk")
-local c_oak_leaves = minetest.get_content_id("yappy:oak_leaves")
-local c_pine_tree = minetest.get_content_id("yappy:pine_trunk")
-local c_pine_needles = minetest.get_content_id("yappy:pine_needles")
-	
-local c_jungletree = minetest.get_content_id("default:jungletree")
-local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
-local c_tree = minetest.get_content_id("default:tree")
-local c_leaves = minetest.get_content_id("default:leaves")
-local c_apple = minetest.get_content_id("default:apple")
+local c_oak_tree   = minetest.get_content_id("lualandmg:oak_trunk")
+local c_oak_leaves = minetest.get_content_id("lualandmg:oak_leaves")
 
-function yappy.gen_oak_tree(x, y, z, area, data)
+local c_pine_tree    = minetest.get_content_id("lualandmg:pine_trunk")
+local c_pine_needles = minetest.get_content_id("lualandmg:pine_needles")
+	
+local c_jungletree   = minetest.get_content_id("default:jungletree")
+local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
+
+local c_tree   = minetest.get_content_id("default:tree")
+local c_leaves = minetest.get_content_id("default:leaves")
+local c_apple  = minetest.get_content_id("default:apple")
+
+function lualandmg.gen_oak_tree(x, y, z, area, data)
 	local node
 	for h = 0, 10 do
 		local s = 0
@@ -53,7 +55,7 @@ function yappy.gen_oak_tree(x, y, z, area, data)
 end
 
 -- original source: https://raw.githubusercontent.com/HeroOfTheWinds/skylands-master/master/functions.lua
-function yappy.gen_pine_tree(x, y, z, area, data)
+function lualandmg.gen_pine_tree(x, y, z, area, data)
 	local node
 	for h = 0, 11 do
 		if h % 3 <= 1 and h > 2 then
@@ -87,7 +89,7 @@ function yappy.gen_pine_tree(x, y, z, area, data)
 end
 
 -- default tree generation code from minetest_game
-function yappy.grow_tree(x, y, z, area, data, is_apple_tree, seed)
+function lualandmg.grow_tree(x, y, z, area, data, is_apple_tree, seed)
 	local pr = PseudoRandom(seed)
 	local th = pr:next(4, 6)
 	for yy = y, y+th-1 do
@@ -148,7 +150,7 @@ function yappy.grow_tree(x, y, z, area, data, is_apple_tree, seed)
 end
 
 -- default jungle tree generation code from minetest_game
-function yappy.grow_jungletree(x, y, z, area, data, seed)
+function lualandmg.grow_jungletree(x, y, z, area, data, seed)
 	local pr = PseudoRandom(seed)
 	for xi = -1, 1 do
 	for zi = -1, 1 do

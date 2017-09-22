@@ -1,0 +1,9 @@
+#    Factor to scale the terrain along the X/Z axis
+lualandmg.noise_spread (Terrain noise spread) float 1 0.05 99
+
+#    Factor to scale the terrain along the Y axis
+lualandmg.terrain_scale (Terrain scale) float 1 0.05 99
+
+#    Default tree chance, default is one out of 14*14 = 196
+#    A value of 0 will disable tree generation
+lualandmg.tree_chance (Tree generation chance) float 196 0 576

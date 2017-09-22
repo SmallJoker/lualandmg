@@ -1,90 +1,119 @@
-yappy.register_biome({
+lualandmg.register_biome({
 	temperature_min = 45,
 	stone = "default:desert_stone",
 	middle = "default:desert_sand",
-	cover = "default:desert_sand"
+	top = "default:desert_sand"
 })
 
-yappy.register_biome({
+lualandmg.register_biome({
 	temperature_min = 38,
 	stone = "default:sandstone",
 	middle = "default:sand",
-	cover = "default:sand"
+	top = "default:sand"
 })
 
-yappy.register_biome({
+lualandmg.register_biome({
 	temperature_min = 34,
 	middle = "default:sand",
 })
 
-yappy.register_biome({
+lualandmg.register_biome({
 	temperature_min = -5
 })
 
-if yappy.generate_snow then
-yappy.register_biome({
+lualandmg.register_biome({
 	temperature_min = -10,
-	cover = "default:dirt_with_snow"
+	top = "default:dirt_with_snow"
 })
 
-yappy.register_biome({
+lualandmg.register_biome({
 	temperature_min = -15,
-	cover = "default:dirt_with_snow",
-	top = "default:snow"
+	top = "default:dirt_with_snow",
+	cover = "default:snow"
 })
 
-yappy.register_biome({
+lualandmg.register_biome({
 	temperature_min = -100,
 	stone = "default:ice",
 	middle = "default:snowblock",
-	cover = "default:snowblock"
+	top = "default:snowblock"
 })
-end
 
-yappy.register_tree({
-	temperature_min = 25,
-	temperature_max = 38,
+lualandmg.register_tree({
+	temperature_min = 27,
+	temperature_max = 40,
 	chance = 6*6,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
-		yappy.grow_jungletree(pos.x, pos.y, pos.z, area, data, seed)
+		lualandmg.grow_jungletree(pos.x, pos.y, pos.z, area, data, seed)
 	end
 })
 
-yappy.register_tree({
+lualandmg.register_tree({
 	temperature_min = 5,
-	temperature_max = 30,
+	temperature_max = 36,
 	chance = 12*12,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
-		yappy.grow_tree(pos.x, pos.y, pos.z, area, data, seed % 3 == 0, seed)
+		lualandmg.grow_tree(pos.x, pos.y, pos.z, area, data, seed % 3 == 0, seed)
 	end
 })
 
-yappy.register_tree({
+lualandmg.register_tree({
 	temperature_min = 20,
 	temperature_max = 35,
 	chance = 20*20,
 	node_under = "default:dirt_with_grass",
 	action = function(pos, data, area, seed)
-		yappy.gen_oak_tree(pos.x, pos.y, pos.z, area, data)
+		lualandmg.gen_oak_tree(pos.x, pos.y, pos.z, area, data)
 	end
 })
 
-yappy.register_tree({
+lualandmg.register_tree({
 	temperature_min = -15,
 	temperature_max = 10,
 	chance = 10*10,
 	node_under = {"default:dirt_with_grass", "default:dirt_with_snow"},
 	action = function(pos, data, area, seed)
-		yappy.gen_pine_tree(pos.x, pos.y, pos.z, area, data)
+		lualandmg.gen_pine_tree(pos.x, pos.y, pos.z, area, data)
 	end
 })
 
-yappy.register_decoration({
+local c_cactus = minetest.get_content_id("default:cactus")
+lualandmg.register_tree({
 	temperature_min = 30,
-	temperature_max = 36,
+	temperature_max = 50,
+	chance = 22*22,
+	node_under = {"default:sand", "default:desert_sand"},
+	action = function(pos, data, area, seed)
+		local x, z = pos.x, pos.z
+		local height = math.random(3, 4)
+		for y = pos.y, pos.y + height do
+			data[area:index(x, y, z)] = c_cactus
+		end
+	end
+})
+
+lualandmg.register_decoration({
+	temperature_min = 30,
+	temperature_max = 45,
+	name = "default:dry_shrub",
+	node_under = "default:sand",
+	chance = 20*20
+})
+
+lualandmg.register_decoration({
+	temperature_min = -5,
+	temperature_max = 30,
+	name = "default:grass_3",
+	node_under = "default:dirt_with_grass",
+	chance = 7*7
+})
+
+lualandmg.register_decoration({
+	temperature_min = 28,
+	temperature_max = 38,
 	name = "default:junglegrass",
 	node_under = "default:dirt_with_grass",
-	chance = 8*8
+	chance = 4*4
 })

@@ -1,10 +1,3 @@
-yappy.c_air		=	minetest.get_content_id("air")
-yappy.c_water	=	minetest.get_content_id("default:water_source")
-yappy.c_lava	=	minetest.get_content_id("default:lava_source")
-yappy.c_stone	=	minetest.get_content_id("default:stone")
-yappy.c_ice		=	minetest.get_content_id("default:ice")
-yappy.c_cactus	=	minetest.get_content_id("default:cactus")
-
 local trees = {
 	pine = {
 		sapling = "skylands_pine_sapling.png", 
@@ -22,7 +15,7 @@ local trees = {
 
 for k, v in pairs(trees) do
 	local name = k:gsub("^%l", string.upper).." "
-	local leaves = "yappy:"..k.."_"..v.leaves[2]
+	local leaves = "lualandmg:"..k.."_"..v.leaves[2]
 
 	minetest.register_node(leaves, {
 		description = name..v.leaves[2],
@@ -35,14 +28,14 @@ for k, v in pairs(trees) do
 		drop = {
 			max_items = 1,
 			items = {
-				{items = {"yappy:"..k.."_sapling"}, rarity = v.leaves[4]},
+				{items = {"lualandmg:"..k.."_sapling"}, rarity = v.leaves[4]},
 				{items = { leaves }}
 			}
 		},
 		sounds = default.node_sound_leaves_defaults(),
 	})
 
-	minetest.register_node("yappy:"..k.."_sapling", {
+	minetest.register_node("lualandmg:"..k.."_sapling", {
 		description = name.."sapling",
 		drawtype = "plantlike",
 		visual_scale = 1.0,
@@ -58,7 +51,7 @@ for k, v in pairs(trees) do
 		sounds = default.node_sound_leaves_defaults(),
 	})
 
-	minetest.register_node("yappy:"..k.."_trunk", {
+	minetest.register_node("lualandmg:"..k.."_trunk", {
 		description = name.."trunk",
 		tiles = { v.trunk[2], v.trunk[2], v.trunk[1] },
 		paramtype2 = "facedir",
@@ -67,7 +60,7 @@ for k, v in pairs(trees) do
 		on_place = minetest.rotate_node
 	})
 	
-	minetest.register_node("yappy:"..k.."_wood", {
+	minetest.register_node("lualandmg:"..k.."_wood", {
 		description = name.."planks",
 		tiles = { v.wood },
 		groups = {wood=1, choppy=2, oddly_breakable_by_hand=2, flammable=3},
@@ -75,16 +68,16 @@ for k, v in pairs(trees) do
 	})
 	
 	minetest.register_craft({
-		output = "yappy:"..k.."_wood 4",
+		output = "lualandmg:"..k.."_wood 4",
 		recipe = {
-			{"yappy:"..k.."_trunk"},
+			{"lualandmg:"..k.."_trunk"},
 		}
 	})
 
 	minetest.register_craft({
 		output = "default:stick 4",
 		recipe = {
-			{"yappy:"..k.."_wood"},
+			{"lualandmg:"..k.."_wood"},
 		}
 	})
 	
@@ -94,7 +87,7 @@ for k, v in pairs(trees) do
 		chance = 5,
 		action = function(pos, node)
 			if minetest.find_node_near(pos, v.leaves[3], 
-					{"ignore", "default:tree", "yappy:"..k.."_trunk"}) then
+					{"ignore", "default:tree", "lualandmg:"..k.."_trunk"}) then
 				return
 			end
 			
@@ -105,13 +98,12 @@ for k, v in pairs(trees) do
 				end
 			end
 			minetest.remove_node(pos)
-			nodeupdate(pos)
 		end
 	})
 end
 
 minetest.register_abm({
-	nodenames = {"yappy:pine_sapling", "yappy:oak_sapling"},
+	nodenames = {"lualandmg:pine_sapling", "lualandmg:oak_sapling"},
 	interval = 50,
 	chance = 50,
 	action = function(pos, node)
@@ -126,10 +118,10 @@ minetest.register_abm({
 			{x=pos.x+6, y=pos.y+14, z=pos.z+6})
 		local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 		local data = vm:get_data()
-		if node.name == "yappy:pine_sapling" then
-			yappy.gen_pine_tree(pos.x, pos.y, pos.z, area, data)
+		if node.name == "lualandmg:pine_sapling" then
+			lualandmg.gen_pine_tree(pos.x, pos.y, pos.z, area, data)
 		else
-			yappy.gen_oak_tree(pos.x, pos.y, pos.z, area, data)
+			lualandmg.gen_oak_tree(pos.x, pos.y, pos.z, area, data)
 		end
 		vm:set_data(data)
 		vm:write_to_map()
