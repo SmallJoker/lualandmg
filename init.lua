@@ -14,7 +14,7 @@ lualandmg.np_base = {
 lualandmg.np_mountains = {
 	offset = 0,
 	scale = 1,
-	spread = {x=192, y=192, z=192},
+	spread = {x=256, y=256, z=256},
 	octaves = 5,
 	seed = 3853,
 	persist = 0.5
@@ -32,7 +32,7 @@ lualandmg.np_trees = {
 lualandmg.np_caves = {
 	offset = 0,
 	scale = 1,
-	spread = {x=48, y=32, z=48},
+	spread = {x=32, y=16, z=32},
 	octaves = 4,
 	seed = -11842,
 	persist = 0.4,
@@ -94,6 +94,19 @@ local c_lava   = minetest.get_content_id("default:lava_source")
 local c_stone  = minetest.get_content_id("default:stone")
 local c_ice    = minetest.get_content_id("default:ice")
 local c_cactus = minetest.get_content_id("default:cactus")
+local heightmap = {}
+local heatmap = {}
+
+local old_funct = minetest.get_mapgen_object
+function minetest.get_mapgen_object(what)
+	if what == "heightmap" then
+		return heightmap
+	end
+	if what == "heatmap" then
+		return heatmap
+	end
+	return old_funct(what)
+end
 
 function lualandmg.generate(minp, maxp, seed, regen)
 	local is_surface = maxp.y > -80
@@ -101,6 +114,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	local t1 = os.clock()
 	local sidelen1d = maxp.x - minp.x + 1
 	local sidelen3d = {x=sidelen1d, y=sidelen1d, z=sidelen1d}
+	heightmap = {}
+	heatmap = {}
 
 	local terrain_scale = lualandmg.terrain_scale
 	local trees = lualandmg.registered_trees
@@ -132,7 +147,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 		for z = minp.z, maxp.z do
 		for x = minp.x, maxp.x do
 			local surf        = nvals_base[nixz] * 20 + 16
-			local mountain_y  = nvals_mountains[nixz] * 70 - 20
+			local mountain_y  = nvals_mountains[nixz] * 80 - 30
 			local tree_factor = nvals_trees[nixz] * 5 + 4
 			local temperature = nvals_temp[nixz] * 43 + 17
 			local tree_index = nil
@@ -188,8 +203,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 			end
 
 			for i, v in pairs(trees) do
-				if temperature >= v.temperature_min and
-						temperature <= v.temperature_max and
+				if j_temperature >= v.temperature_min and
+						j_temperature <= v.temperature_max and
 						math.random(math.ceil(v.chance * tree_factor)) == 1 then
 
 					if lualandmg.is_valid_ground(v.node_under, g_top) then
@@ -205,8 +220,11 @@ function lualandmg.generate(minp, maxp, seed, regen)
 			nixz = nixz + 1
 		end
 		end
-		nixz = 1
+		nvals_base = nil
+		nvals_mountains = nil
+		nvals_trees = nil
 	end
+
 
 	local vm, emin, emax
 	if regen then
@@ -234,6 +252,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 
 	local nvals_caves = minetest.get_perlin_map(lualandmg.np_caves, sidelen3d):get3dMap_flat(minp)
 	local nixyz = 1
+	nixz = 1
 
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
@@ -302,6 +321,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	end
 	nixz = nixz + sidelen1d
 	end
+	nvals_caves = nil
 
 	local t2 = os.clock()
 	local log_message = (minetest.pos_to_string(minp).." generated in "..
@@ -347,6 +367,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 
 					if is_air then
 						if water then
+							-- Fill up caves to prevent massive flood
 							data[vi] = c_water
 						elseif depth > 0 then
 							covered = true
@@ -362,6 +383,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 					vi = area:index(x, ground, z)
 					if ground >= 0 and not covered then
 						data[vi] = g_top
+						-- Update terrain height for heightmap
+						cache[1] = ground
 					else
 						data[vi] = g_middle
 					end
@@ -369,6 +392,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 					data[vi] = g_middle
 				end
 			end
+			heightmap[nixz] = surface[nixz][1]
+			heatmap[nixz] = nvals_temp[nixz] * 50 + 50
 			nixz = nixz + 1
 		end
 		end
@@ -379,8 +404,6 @@ function lualandmg.generate(minp, maxp, seed, regen)
 		end
 	end
 
-	minetest.generate_ores(vm, minp, maxp)
-
 	vm:set_data(data)
 	if regen then
 		vm:set_param2_data({})
@@ -388,9 +411,12 @@ function lualandmg.generate(minp, maxp, seed, regen)
 		vm:set_lighting({day=0, night=0})
 	end
 	vm:calc_lighting()
-	vm:write_to_map(data)
+	vm:write_to_map()
 	vm:update_liquids()
+	minetest.generate_ores(vm, minp, maxp)
+	minetest.generate_decorations(vm, minp, maxp)
 	minetest.log("action", log_message)
 end
 
-table.insert(minetest.registered_on_generateds, 1, lualandmg.generate)
+minetest.after(0, table.insert,
+	minetest.registered_on_generateds, 1, lualandmg.generate)
