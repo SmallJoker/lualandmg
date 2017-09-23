@@ -3,8 +3,8 @@ local c_ignore = minetest.get_content_id("ignore")
 local c_oak_tree   = minetest.get_content_id("lualandmg:oak_trunk")
 local c_oak_leaves = minetest.get_content_id("lualandmg:oak_leaves")
 
-local c_pine_tree    = minetest.get_content_id("lualandmg:pine_trunk")
-local c_pine_needles = minetest.get_content_id("lualandmg:pine_needles")
+local c_pine_tree    = minetest.get_content_id("default:pine_tree")
+local c_pine_needles = minetest.get_content_id("default:pine_needles")
 	
 local c_jungletree   = minetest.get_content_id("default:jungletree")
 local c_jungleleaves = minetest.get_content_id("default:jungleleaves")

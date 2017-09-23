@@ -324,8 +324,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	nvals_caves = nil
 
 	local t2 = os.clock()
-	local log_message = (minetest.pos_to_string(minp).." generated in "..
-			math.ceil((t2 - t1) * 1000).." ms")
+	local log_message = minetest.pos_to_string(minp).." terrain = "..
+			math.ceil((t2 - t1) * 1000)
 
 	if is_surface then
 		-- Do the mudflow!
@@ -398,10 +398,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 		end
 		end
 
-		local td = math.ceil((os.clock() - t2) * 1000)
-		if td > 0 then
-			log_message = log_message..", mudflow in "..td.."ms"
-		end
+		log_message = log_message..", mudflow = "..
+			math.ceil((os.clock() - t2) * 1000)
 	end
 
 	vm:set_data(data)
@@ -410,11 +408,14 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	else
 		vm:set_lighting({day=0, night=0})
 	end
+	minetest.generate_ores(vm, minp, maxp)
+
 	vm:calc_lighting()
 	vm:write_to_map()
 	vm:update_liquids()
-	minetest.generate_ores(vm, minp, maxp)
-	minetest.generate_decorations(vm, minp, maxp)
+
+	log_message = log_message..", total = "..
+		math.ceil((os.clock() - t1) * 1000).." [ms]"
 	minetest.log("action", log_message)
 end
 
