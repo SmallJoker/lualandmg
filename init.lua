@@ -150,10 +150,10 @@ function lualandmg.generate(minp, maxp, seed, regen)
 			local mountain_y  = nvals_mountains[nixz] * 80 - 30
 			local tree_factor = nvals_trees[nixz] * 5 + 4
 			local temperature = nvals_temp[nixz] * 43 + 17
-			local tree_index = nil
+			local tree = nil
 
 			-- 'j_*' used for jitter/spread values
-			local j_temperature = temperature + math.random(-4, 4)
+			local j_temperature = temperature + math.random(-3, 3)
 
 			if mountain_y > 0 then
 				surf = surf + mountain_y
@@ -183,10 +183,10 @@ function lualandmg.generate(minp, maxp, seed, regen)
 			end
 
 			if not g_cover then
-				for i, v in ipairs(decorations) do
+				for i, v in pairs(decorations) do
 					if j_temperature >= v.temperature_min and
 							j_temperature <= v.temperature_max and
-							(v.chance <= 1 or math.random(v.chance) == 1) then
+							math.random(v.chance) == 1 then
 	
 						if lualandmg.is_valid_ground(v.node_under, g_top) then
 							g_cover = v.name
@@ -208,14 +208,14 @@ function lualandmg.generate(minp, maxp, seed, regen)
 						math.random(math.ceil(v.chance * tree_factor)) == 1 then
 
 					if lualandmg.is_valid_ground(v.node_under, g_top) then
-						tree_index = i
+						tree = v
 						g_cover = nil
 						break
 					end
 				end
 			end
 
-			surface[nixz] = {surf, tree_index, temperature,
+			surface[nixz] = {surf, tree, temperature,
 					g_stone, g_middle, g_top, g_cover}
 			nixz = nixz + 1
 		end
@@ -288,7 +288,10 @@ function lualandmg.generate(minp, maxp, seed, regen)
 			elseif y == surf then
 				-- Surface, maybe with a tree above
 				if tree then
-					trees[tree].action(vector.new(x, y + 1, z), data, area, seed)
+					tree.action(
+						vector.new(x, y + 1, z),
+						vm, data, area, seed
+					)
 					data[vi] = g_middle
 				else
 					data[vi] = g_top
@@ -299,7 +302,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 						data[vi] = g_cover
 					end
 				end
-			elseif surf - y <= 3 and y < surf then
+			elseif surf - y <= (3 - surf / 30) and y < surf then
 				-- Soil/sand under the surface
 				data[vi] = g_middle
 			elseif y > surf and y <= 0  then
@@ -408,7 +411,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	else
 		vm:set_lighting({day=0, night=0})
 	end
-	minetest.generate_ores(vm, minp, maxp)
+	minetest.generate_ores(vm)
 
 	vm:calc_lighting()
 	vm:write_to_map()
