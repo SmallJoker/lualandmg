@@ -254,6 +254,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	local nixyz = 1
 	nixz = 1
 
+	-- Lava occurrence coefficient, maximal lava at Y=-4096
+	local lava_coeff = math.max(minp.y / 4096, -1) / 5
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
 		local vi = area:index(minp.x, y, z)
@@ -274,10 +276,14 @@ function lualandmg.generate(minp, maxp, seed, regen)
 				g_cover  = cache[7]
 			end
 			local cave = nvals_caves[nixyz]
-			if cave > 1 and y < -20 and not (is_surface and temp < 5) then
+
+			if cave > 1.1 + lava_coeff and y < -20
+					and not (is_surface and temp < 5) then
 				-- Cave, filled with lava
-				data[vi] = c_lava
-			elseif cave < -0.9 and y <= surf + 1 then
+				if cave > 1.3 + lava_coeff then
+					data[vi] = c_lava
+				end
+			elseif cave < -0.9 + lava_coeff / 2 and y <= surf + 1 then
 				-- Empty cave
 				if is_surface then
 					mudflow_check[nixz] = true
