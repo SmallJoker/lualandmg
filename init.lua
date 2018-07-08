@@ -133,10 +133,10 @@ function lualandmg.generate(minp, maxp, seed, regen)
 			lualandmg.pm_sidelen = sidelen1d
 		end
 
-		nvals_base      = lualandmg.pm_base:get2dMap_flat({x=minp.x, y=minp.z})
-		nvals_mountains = lualandmg.pm_mountains:get2dMap_flat({x=minp.x, y=minp.z})
-		nvals_trees     = lualandmg.pm_trees:get2dMap_flat({x=minp.x, y=minp.z})
-		nvals_temp      = lualandmg.pm_temp:get2dMap_flat({x=minp.x, y=minp.z})
+		nvals_base      = lualandmg.pm_base:get_2d_map_flat({x=minp.x, y=minp.z})
+		nvals_mountains = lualandmg.pm_mountains:get_2d_map_flat({x=minp.x, y=minp.z})
+		nvals_trees     = lualandmg.pm_trees:get_2d_map_flat({x=minp.x, y=minp.z})
+		nvals_temp      = lualandmg.pm_temp:get_2d_map_flat({x=minp.x, y=minp.z})
 	end
 
 	-- Pre-calculate terrain height, biome and trees
@@ -250,7 +250,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 		end
 	end
 
-	local nvals_caves = minetest.get_perlin_map(lualandmg.np_caves, sidelen3d):get3dMap_flat(minp)
+	local nvals_caves = minetest.get_perlin_map(lualandmg.np_caves, sidelen3d):get3d_map_flat(minp)
 	local nixyz = 1
 	nixz = 1
 
