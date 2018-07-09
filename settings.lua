@@ -6,7 +6,7 @@ local setting_defaults = {
 }
 
 for k, v in pairs(setting_defaults) do
-	lualandmg[k] = tonumber(minetest.setting_get("lualandmg."..k)) or v
+	lualandmg[k] = tonumber(minetest.settings:get("lualandmg."..k)) or v
 end
 
 assert(lualandmg.noise_spread > 0, "LuaLandMG: Setting noise_spread must be > 0")

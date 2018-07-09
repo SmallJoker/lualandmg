@@ -250,7 +250,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 		end
 	end
 
-	local nvals_caves = minetest.get_perlin_map(lualandmg.np_caves, sidelen3d):get3d_map_flat(minp)
+	local nvals_caves = minetest.get_perlin_map(lualandmg.np_caves, sidelen3d):get_3d_map_flat(minp)
 	local nixyz = 1
 	nixz = 1
 
