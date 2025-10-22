@@ -1,7 +1,7 @@
  LuaLandMG
 ===========
 
-A simple Lua mapgen for Minetest.
+A simple Lua mapgen for Luanti/Minetest.
 Features:
 	Trees: Normal, pine and oak
 	Ores

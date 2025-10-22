@@ -1,5 +1,5 @@
 lualandmg = {}
-local mod_path = minetest.get_modpath("lualandmg")
+local mod_path = core.get_modpath("lualandmg")
 
 -- Default noise params
 lualandmg.np_base = {
@@ -62,9 +62,9 @@ for _,v in pairs(np_list) do
 		lualandmg[v].spread, lualandmg.noise_spread)
 end
 
-minetest.set_mapgen_setting("mgname", "singlenode", true)
+core.set_mapgen_setting("mgname", "singlenode", true)
 
-minetest.register_chatcommand("regenerate", {
+core.register_chatcommand("regenerate", {
 	description = "Regenerates <size * 8>^3 nodes around you",
 	params = "<size * 8>",
 	privs = {server=true},
@@ -78,7 +78,7 @@ minetest.register_chatcommand("regenerate", {
 		end
 
 		size = size * 8
-		local player = minetest.get_player_by_name(name)
+		local player = core.get_player_by_name(name)
 		local pos = vector.floor(vector.divide(player:getpos(), size))
 		local minp = vector.multiply(pos, size)
 		local maxp = vector.add(minp, size - 1)
@@ -88,17 +88,17 @@ minetest.register_chatcommand("regenerate", {
 	end
 })
 
-local c_air    = minetest.get_content_id("air")
-local c_water  = minetest.get_content_id("default:water_source")
-local c_lava   = minetest.get_content_id("default:lava_source")
-local c_stone  = minetest.get_content_id("default:stone")
-local c_ice    = minetest.get_content_id("default:ice")
-local c_cactus = minetest.get_content_id("default:cactus")
+local c_air    = core.get_content_id("air")
+local c_water  = core.get_content_id("default:water_source")
+local c_lava   = core.get_content_id("default:lava_source")
+local c_stone  = core.get_content_id("default:stone")
+local c_ice    = core.get_content_id("default:ice")
+local c_cactus = core.get_content_id("default:cactus")
 local heightmap = {}
 local heatmap = {}
 
-local old_funct = minetest.get_mapgen_object
-function minetest.get_mapgen_object(what)
+local old_funct = core.get_mapgen_object
+function core.get_mapgen_object(what)
 	if what == "heightmap" then
 		return heightmap
 	end
@@ -112,8 +112,12 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	local is_surface = maxp.y > -80
 
 	local t1 = os.clock()
-	local sidelen1d = maxp.x - minp.x + 1
-	local sidelen3d = {x=sidelen1d, y=sidelen1d, z=sidelen1d}
+	local sidelen3d = {
+		x = maxp.x - minp.x + 1,
+		y = maxp.y - minp.y + 1,
+		z = maxp.z - minp.z + 1
+	}
+	--print("generate", is_surface and "surface" or "underground", core.pos_to_string(sidelen3d))
 	heightmap = {}
 	heatmap = {}
 
@@ -125,12 +129,14 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	local nvals_base, nvals_mountains, nvals_trees, nvals_temp
 	if is_surface then
 		-- Update the perlin maps if required
-		if lualandmg.pm_sidelen ~= sidelen1d then
-			lualandmg.pm_base      = minetest.get_perlin_map(lualandmg.np_base, sidelen3d)
-			lualandmg.pm_mountains = minetest.get_perlin_map(lualandmg.np_mountains, sidelen3d)
-			lualandmg.pm_trees     = minetest.get_perlin_map(lualandmg.np_trees, sidelen3d)
-			lualandmg.pm_temp      = minetest.get_perlin_map(lualandmg.np_temperature, sidelen3d)
-			lualandmg.pm_sidelen = sidelen1d
+		if not vector.equals(lualandmg.pm_sidelen or {}, sidelen3d) then
+			-- Low-cost preparation of all noise generators (for this thread)
+			local sidelen_xy = { x = sidelen3d.x, y = sidelen3d.z, z = 0 }
+			lualandmg.pm_base      = core.get_perlin_map(lualandmg.np_base, sidelen_xy)
+			lualandmg.pm_mountains = core.get_perlin_map(lualandmg.np_mountains, sidelen_xy)
+			lualandmg.pm_trees     = core.get_perlin_map(lualandmg.np_trees, sidelen_xy)
+			lualandmg.pm_temp      = core.get_perlin_map(lualandmg.np_temperature, sidelen_xy)
+			lualandmg.pm_sidelen = sidelen3d
 		end
 
 		nvals_base      = lualandmg.pm_base:get_2d_map_flat({x=minp.x, y=minp.z})
@@ -187,7 +193,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 					if j_temperature >= v.temperature_min and
 							j_temperature <= v.temperature_max and
 							math.random(v.chance) == 1 then
-	
+
 						if lualandmg.is_valid_ground(v.node_under, g_top) then
 							g_cover = v.name
 							break
@@ -228,10 +234,10 @@ function lualandmg.generate(minp, maxp, seed, regen)
 
 	local vm, emin, emax
 	if regen then
-		vm = minetest.get_voxel_manip()
+		vm = core.get_voxel_manip()
 		emin, emax = vm:read_from_map(minp, maxp)
 	else
-		vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+		vm, emin, emax = core.get_mapgen_object("voxelmanip")
 	end
 
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
@@ -250,7 +256,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 		end
 	end
 
-	local nvals_caves = minetest.get_perlin_map(lualandmg.np_caves, sidelen3d):get_3d_map_flat(minp)
+	local nvals_caves = core.get_perlin_map(lualandmg.np_caves, sidelen3d):get_3d_map_flat(minp)
 	local nixyz = 1
 	nixz = 1
 
@@ -326,14 +332,14 @@ function lualandmg.generate(minp, maxp, seed, regen)
 			nixz = nixz + 1
 			vi = vi + 1
 		end
-		nixz = nixz - sidelen1d
+		nixz = nixz - sidelen3d.x
 	end
-	nixz = nixz + sidelen1d
+	nixz = nixz + sidelen3d.x
 	end
 	nvals_caves = nil
 
 	local t2 = os.clock()
-	local log_message = minetest.pos_to_string(minp).." terrain = "..
+	local log_message = core.pos_to_string(minp).." terrain = "..
 			math.ceil((t2 - t1) * 1000)
 
 	if is_surface then
@@ -417,7 +423,7 @@ function lualandmg.generate(minp, maxp, seed, regen)
 	else
 		vm:set_lighting({day=0, night=0})
 	end
-	minetest.generate_ores(vm)
+	core.generate_ores(vm)
 
 	vm:calc_lighting()
 	vm:write_to_map()
@@ -425,8 +431,8 @@ function lualandmg.generate(minp, maxp, seed, regen)
 
 	log_message = log_message..", total = "..
 		math.ceil((os.clock() - t1) * 1000).." [ms]"
-	minetest.log("action", log_message)
+	core.log("action", log_message)
 end
 
-minetest.after(0, table.insert,
-	minetest.registered_on_generateds, 1, lualandmg.generate)
+core.after(0, table.insert,
+	core.registered_on_generateds, 1, lualandmg.generate)
